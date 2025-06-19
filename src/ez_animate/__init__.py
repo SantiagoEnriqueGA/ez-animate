@@ -1,4 +1,4 @@
 __version__ = "0.1.0"
-from .animator import Animator
+from .animator import ClassificationAnimation, ForecastingAnimation, RegressionAnimation
 
-__all__ = ["Animator"]
+__all__ = ["ForecastingAnimation", "RegressionAnimation", "ClassificationAnimation"]

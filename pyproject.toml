@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
     "matplotlib>=3",
     "numpy>=2",
+    "scipy>=1.10",
 ]
 
 [project.optional-dependencies]
@@ -43,8 +44,10 @@ lint = [
 # Combined 'dev' group for convenience
 dev = [
     "ez-animate[test,docs,lint]",
+    "pytest-cov",
     "build>=1.2",
     "twine>=5.0",
+    "sega_learn",
 ]
 
 [project.urls]
@@ -55,7 +58,7 @@ Repository = "https://github.com/SantiagoEnriqueGA/ez-animate"
 target-version = "py313"
 
 # Define directories/files to check
-src = ["src", "tests"]
+src = ["src", "tests", "examples"]
 
 # Exclude directories/files Ruff should ignore
 exclude = [
@@ -113,12 +116,14 @@ select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM", "TID", "D"]
 
 
 # Add the specific codes to ignore
-ignore = ["F403", "F405", "E501", "D100", "D104", "D105"]
+ignore = ["F403", "F405", "E501", "D100", "D104", "D105", "UP038", "B905"]
 # F403/405 are "import *" statements
 # E501 is line length (ruff format . will still try to wrap lines)
 # D100 is missing docstring in public module
 # D104 is missing docstring in public package
 # D105 is missing docstring in magic method (__name__, __str__, etc.)
+# UP038 this rule was deprecated
+# B905 checks for zip calls without an explicit strict parameter.
 
 # Keep fixable settings
 fixable = ["ALL"]

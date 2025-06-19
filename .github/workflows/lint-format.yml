@@ -1,0 +1,30 @@
+# filepath: .github/workflows/lint-format.yml
+name: Lint and Format Check
+
+on:
+  push:
+    branches: [ "main" ] # Main development branch
+  pull_request:
+    branches: [ "main" ] # Main development branch
+
+permissions:
+  contents: read # Needed to checkout the code
+
+jobs:
+  ruff:
+    name: Run ruff linter and formatter
+    runs-on: ubuntu-latest # Generally faster/cheaper than windows-latest unless needed
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Ruff
+        uses: chartboost/ruff-action@v1
+        # Optional: Specify arguments if needed, but defaults are usually fine
+        # with:
+        #   args: "check --select=E,F,W,I ." # Example to override default check args

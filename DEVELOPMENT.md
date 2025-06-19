@@ -88,7 +88,7 @@ To run tests in a specific file:
 uv run pytest tests/test_animator.py
 ```
 
-To run tests with code coverage (if `pytest-cov` is installed):
+To run tests with code coverage:
 
 ```bash
 uv run pytest --cov=src/ez_animate --cov-report=term-missing
@@ -96,7 +96,7 @@ uv run pytest --cov=src/ez_animate --cov-report=term-missing
 
 ## Code Style and Linting
 
-To maintain a consistent and high-quality codebase, we use **Black** for code formatting and **Ruff** for linting. Before submitting any code, please run these tools.
+To maintain a consistent and high-quality codebase, we use **Ruff** for code formatting and linting. Before submitting any code, please run this tool.
 
 ### Ruff (Linter and Formatter)
 
@@ -137,7 +137,7 @@ Now, open your web browser and navigate to **[http://127.0.0.1:8000](http://127.
     ```bash
     uv run pytest
     uv run ruff check . --fix
-    uv run black .
+    uv run ruff format .
     ```
 4.  **Commit Your Code:** Use a descriptive commit message following the [Conventional Commits](https://www.conventionalcommits.org/) standard.
     ```bash
@@ -158,29 +158,3 @@ The project's dependencies are defined in `pyproject.toml`.
 -   **Development dependencies** are listed under `[project.optional-dependencies]`.
 
 If you need to add or remove a dependency, please update `pyproject.toml` accordingly and mention it in your Pull Request.
-
----
-
-### **Companion `pyproject.toml` Snippet**
-
-To make the `uv pip install -e .[test,lint,docs]` command work, you need to define these groups in your `pyproject.toml`. Here is the relevant section updated to include `lint`.
-
-```toml
-# pyproject.toml
-
-# ... (other sections like [build-system] and [project])
-
-[project.optional-dependencies]
-test = [
-    "pytest",
-    "pytest-cov", # Optional, for coverage reports
-]
-docs = [
-    "mkdocs",
-    "mkdocs-material",
-]
-lint = [
-    "black",
-    "ruff",
-]
-```
