@@ -48,6 +48,7 @@ dev = [
     "build>=1.2",
     "twine>=5.0",
     "sega_learn",
+    "pre-commit",
 ]
 
 [project.urls]

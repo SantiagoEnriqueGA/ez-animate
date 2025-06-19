@@ -201,7 +201,6 @@ def train_test_split(
     return result
 
 
-
 class PCA:
     """Principal Component Analysis (PCA) implementation."""
 
@@ -322,4 +321,3 @@ class PCA:
         if X_reduced.ndim != 2:
             raise ValueError("Input data must be a 2D array.")
         return np.dot(X_reduced, self.components_.T) + self.mean_
-

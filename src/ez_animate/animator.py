@@ -595,6 +595,7 @@ class RegressionAnimation(AnimationBase):
 
         return (self.predicted_line,)
 
+
 # TODO: Fix, this class fails with matplotlib >3.8.0
 # This is because of the way we handle contour plots
 # Version 3.8 changed the API for contour plots
