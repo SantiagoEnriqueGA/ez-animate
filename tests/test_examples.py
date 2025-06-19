@@ -5,10 +5,10 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import contextlib
-import glob
 import importlib.util
 import io
 import unittest
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from tests.utils import BaseTest, strip_file_path
@@ -26,6 +26,7 @@ plt.show = lambda *args, **kwargs: None
 
 def make_example_test(example_file):
     """Creates a test function for a given example file that imports and executes it."""
+
     def test_func(self):
         """Tests the functionality of a given example file by importing it as a module and executing it."""
         print(
@@ -37,11 +38,13 @@ def make_example_test(example_file):
         example_module = importlib.util.module_from_spec(spec)
         with contextlib.redirect_stdout(io.StringIO()):
             spec.loader.exec_module(example_module)
+
     return test_func
 
 
 def make_exception_test(example_file):
     """Creates a test function for a given example file that is expected to raise an exception."""
+
     def test_func(self):
         # Placeholder for exception-specific test logic
         # You can customize this as needed
@@ -67,9 +70,8 @@ class ExampleFileTests(BaseTest):
 
 
 # Dynamically generate test cases for each example file at import time (for pytest compatibility)
-example_files = glob.glob(
-    os.path.join(os.path.dirname(__file__), "..\\examples\\*.py")
-)
+examples_dir = Path(__file__).parent.parent / "examples"
+example_files = list(examples_dir.glob("*.py"))
 if not example_files:
     raise FileNotFoundError("No example files found.")
 test_exceptions = [f"test_{name}" for name in TEST_EXCEPTIONS]

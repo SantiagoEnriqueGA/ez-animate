@@ -578,6 +578,8 @@ lint = [
 ]
 test = [
     { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "sega-learn" },
 ]
 
 [package.metadata]
@@ -590,10 +592,10 @@ requires-dist = [
     { name = "numpy", specifier = ">=2" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'" },
+    { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "ruff", marker = "extra == 'lint'" },
     { name = "scipy", specifier = ">=1.10" },
-    { name = "sega-learn", marker = "extra == 'dev'" },
+    { name = "sega-learn", marker = "extra == 'test'" },
     { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0" },
 ]
 provides-extras = ["test", "docs", "lint", "dev"]
