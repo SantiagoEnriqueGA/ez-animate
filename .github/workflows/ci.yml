@@ -31,7 +31,7 @@ jobs:
           echo "$GITHUB_WORKSPACE/.venv/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: uv pip install -e .[test,lint,docs]
+        run: uv pip install -e .[dev]
 
       - name: Run tests
         run: uv run --python $(which python) pytest --cov=src/ez_animate --cov-report=term-missing
