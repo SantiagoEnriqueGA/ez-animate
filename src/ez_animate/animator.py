@@ -596,10 +596,6 @@ class RegressionAnimation(AnimationBase):
         return (self.predicted_line,)
 
 
-# TODO: Fix, this class fails with matplotlib >3.8.0
-# This is because of the way we handle contour plots
-# Version 3.8 changed the API for contour plots
-# See https://matplotlib.org/stable/api/prev_api_changes/api_changes_3.8.0.html#contourset-is-now-a-single-collection
 class ClassificationAnimation(AnimationBase):
     """Class for creating animations of classification models."""
 
@@ -778,8 +774,14 @@ class ClassificationAnimation(AnimationBase):
         """
         # Clear the previous decision boundary if it exists
         if hasattr(self, "decision_boundary") and self.decision_boundary:
-            for collection in self.decision_boundary.collections:
-                collection.remove()
+            # For Matplotlib >=3.8, QuadContourSet is a Collection, remove directly
+            try:
+                self.decision_boundary.remove()
+            except Exception:
+                # For older versions, fallback to removing collections
+                if hasattr(self.decision_boundary, "collections"):
+                    for collection in self.decision_boundary.collections:
+                        collection.remove()
 
         # Clear the previous decision boundary lines if they exist
         if hasattr(self, "decision_boundary_lines") and self.decision_boundary_lines:
@@ -787,14 +789,21 @@ class ClassificationAnimation(AnimationBase):
                 # For all previous decision boundaries, set alpha from 0.1 to 0.5 based on the number of lines
                 self.previous_decision_lines.append(self.decision_boundary_lines)
                 for i, collection in enumerate(self.previous_decision_lines):
-                    collection.set_alpha(
-                        0.1 + (0.4 / len(self.previous_decision_lines)) * i
-                    )
-                    collection.set_color("black")
+                    try:
+                        collection.set_alpha(
+                            0.1 + (0.4 / len(self.previous_decision_lines)) * i
+                        )
+                        collection.set_color("black")
+                    except Exception:
+                        pass
             else:
                 # Remove previous decision boundary lines
-                for collection in self.decision_boundary_lines.collections:
-                    collection.remove()
+                try:
+                    self.decision_boundary_lines.remove()
+                except Exception:
+                    if hasattr(self.decision_boundary_lines, "collections"):
+                        for collection in self.decision_boundary_lines.collections:
+                            collection.remove()
 
         # Predict on the mesh grid
         mesh_points = np.c_[self.xx.ravel(), self.yy.ravel()]
