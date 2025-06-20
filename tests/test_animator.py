@@ -9,6 +9,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from tests.utils import BaseTest, suppress_print
+
+from ez_animate import (
+    ClassificationAnimation,
+    ForecastingAnimation,
+    RegressionAnimation,
+)
 from sega_learn.linear_models import LogisticRegression, Ridge
 from sega_learn.time_series.moving_average import ExponentialMovingAverage
 from sega_learn.utils import (
@@ -16,13 +23,6 @@ from sega_learn.utils import (
     make_classification,
     make_regression,
     make_time_series,
-)
-from tests.utils import BaseTest, suppress_print
-
-from ez_animate import (
-    ClassificationAnimation,
-    ForecastingAnimation,
-    RegressionAnimation,
 )
 
 

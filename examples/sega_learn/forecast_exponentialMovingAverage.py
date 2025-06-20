@@ -1,7 +1,8 @@
-from sega_learn.time_series.moving_average import WeightedMovingAverage
-from sega_learn.utils import Metrics, make_time_series
+import numpy as np
 
 from ez_animate import ForecastingAnimation
+from sega_learn.time_series.moving_average import ExponentialMovingAverage
+from sega_learn.utils import Metrics, make_time_series
 
 # Generate a synthetic time series
 time_series = make_time_series(
@@ -25,12 +26,12 @@ forecast_steps = len(test_series)
 
 # Create the animation using forecastingAnimation
 animator = ForecastingAnimation(
-    model=WeightedMovingAverage,
+    model=ExponentialMovingAverage,
     train_series=train_series,
     test_series=test_series,
     forecast_steps=forecast_steps,
     keep_previous=True,
-    dynamic_parameter="window",
+    dynamic_parameter="alpha",
     metric_fn=[
         Metrics.mean_squared_error,
         Metrics.mean_absolute_error,
@@ -48,10 +49,10 @@ animator.setup_plot(
 )
 
 # Create and save the animation
-window_range = range(1, 51)  # Windows from 1 to 50
-animator.animate(frames=window_range, interval=150, blit=True, repeat=False)
+alpha_range = np.arange(0.01, 0.5, 0.01)
+animator.animate(frames=alpha_range, interval=150, blit=True, repeat=False)
 # animator.save(
-#     filename="examples/utils/plots/animator_wma_forecast_animation.gif",
+#     filename="examples/utils/plots/animator_ema_forecast_animation.gif",
 #     writer="pillow",
 #     fps=5,
 #     dpi=300,

@@ -1,7 +1,6 @@
+from ez_animate import ClassificationAnimation
 from sega_learn.linear_models import Perceptron
 from sega_learn.utils import Metrics, Scaler, make_classification
-
-from ez_animate import ClassificationAnimation
 
 # Generate a binary classification dataset
 X, y = make_classification(

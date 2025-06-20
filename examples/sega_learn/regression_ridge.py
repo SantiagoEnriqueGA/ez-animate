@@ -1,7 +1,6 @@
+from ez_animate import RegressionAnimation
 from sega_learn.linear_models import Ridge
 from sega_learn.utils import Metrics, make_regression
-
-from ez_animate import RegressionAnimation
 
 # Generate synthetic regression data
 X, y = make_regression(n_samples=1000, n_features=1, noise=0.5, random_state=42)

@@ -71,7 +71,8 @@ class ExampleFileTests(BaseTest):
 
 # Dynamically generate test cases for each example file at import time (for pytest compatibility)
 examples_dir = Path(__file__).parent.parent / "examples"
-example_files = list(examples_dir.glob("*.py"))
+example_files = list(examples_dir.glob("**/*.py"))
+
 if not example_files:
     raise FileNotFoundError("No example files found.")
 test_exceptions = [f"test_{name}" for name in TEST_EXCEPTIONS]
