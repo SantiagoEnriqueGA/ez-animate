@@ -2,7 +2,7 @@ import numpy as np
 
 from ez_animate import RegressionAnimation
 from sega_learn.utils import Metrics, make_regression
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso
 
 # Generate synthetic regression data
 X, y = make_regression(
@@ -17,7 +17,7 @@ X, y = make_regression(
 
 # Create the animation using RegressionAnimation
 animator = RegressionAnimation(
-    model=Ridge,
+    model=Lasso,
     X=X,
     y=y,
     test_size=0.25,
@@ -33,7 +33,7 @@ animator = RegressionAnimation(
 
 # Set up the plot
 animator.setup_plot(
-    title="Ridge Regression Animation",
+    title="Lasso Regression Animation",
     xlabel="Feature Coefficient",
     ylabel="Target Value",
     legend_loc="upper left",
@@ -45,7 +45,7 @@ animator.setup_plot(
 alpha_range = np.arange(0.01, 1.0, 0.01)
 animator.animate(frames=alpha_range, interval=150, blit=True, repeat=False)
 # animator.save(
-#     filename="examples/utils/plots/animator_ridge.gif",
+#     filename="examples/utils/plots/animator_lasso.gif",
 #     writer="pillow",
 #     fps=10,
 #     dpi=300,

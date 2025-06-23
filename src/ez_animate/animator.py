@@ -287,8 +287,65 @@ class ForecastingAnimation(AnimationBase):
         self.model_instance = self.model(
             **{self.dynamic_parameter: frame}, **self.static_parameters
         )
-        self.fitted_values = self.model_instance.fit(self.train_data)
-        self.forecast_values = self.model_instance.forecast(steps=self.forecast_steps)
+        if not hasattr(self.model_instance, "fit"):
+            raise AttributeError(
+                f"{self.model.__name__} needs a 'fit' method to train the model."
+            )
+        try:
+            self.model_instance.fit(self.train_data)
+        except TypeError:
+            try:
+                # Where model.fit requires (X,y) format
+                self.model_instance.fit(
+                    np.arange(len(self.train_data)).reshape(-1, 1),
+                    self.train_data,
+                )
+            except Exception as e:
+                print(f"Error fitting model: {e}")
+
+        # In-sample fitted values (for training data)
+        if hasattr(self.model_instance, "predict"):  # sktime convention
+            try:
+                self.fitted_values = self.model_instance.predict(
+                    np.arange(len(self.train_data)).reshape(-1, 1)
+                )
+            except Exception:
+                self.fitted_values = np.array(self.train_data)
+        else:
+            self.fitted_values = np.array(self.train_data)
+
+        # Forecast for test set
+        if hasattr(self.model_instance, "forecast"):
+            self.forecast_values = self.model_instance.forecast(
+                steps=self.forecast_steps
+            )
+        elif hasattr(self.model_instance, "predict"):
+            try:
+                self.forecast_values = self.model_instance.predict(self.forecast_steps)
+            except Exception:
+                try:
+                    X = np.arange(
+                        len(self.train_data),
+                        len(self.train_data) + self.forecast_steps,
+                    ).reshape(-1, 1)
+                    self.forecast_values = self.model_instance.predict(X)
+                except Exception as e:
+                    print(f"Error predicting forecast: {e}")
+                    self.forecast_values = np.zeros(self.forecast_steps)
+        else:
+            raise AttributeError(
+                f"{self.model.__name__} needs a 'forecast' or 'predict' method to generate forecasts."
+            )
+
+        # Convert to numpy arrays if pandas Series
+        if hasattr(self.fitted_values, "to_numpy"):
+            self.fitted_values = self.fitted_values.to_numpy()
+        if hasattr(self.forecast_values, "to_numpy"):
+            self.forecast_values = self.forecast_values.to_numpy()
+
+        # Ensure 1D
+        self.fitted_values = np.asarray(self.fitted_values).flatten()
+        self.forecast_values = np.asarray(self.forecast_values).flatten()
 
     def update_plot(self, frame):
         """Update the plot for the current frame.
@@ -336,7 +393,7 @@ class ForecastingAnimation(AnimationBase):
 
                 # Trim values
                 metric_value = round(metric_value, 4)
-                frame = round(frame, 2)
+                frame = round(frame, 2) if isinstance(frame, float) else frame
 
                 self.ax.set_title(
                     f"Forecast ({self.dynamic_parameter}={frame}) - {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}"
@@ -352,7 +409,7 @@ class ForecastingAnimation(AnimationBase):
                     metric_fn(self.test_data, self.forecast_values)
                     for metric_fn in self.metric_fn
                 ]
-                frame = round(frame, 2)
+                frame = round(frame, 2) if isinstance(frame, float) else frame
 
                 self.ax.set_title(
                     f"Forecast ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}"
