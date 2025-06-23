@@ -301,7 +301,10 @@ class ForecastingAnimation(AnimationBase):
                     self.train_data,
                 )
             except Exception as e:
-                print(f"Error fitting model: {e}")
+                raise TypeError(
+                    f"Model {self.model.__name__} fit failed with error: {e}. "
+                    "Ensure the model's fit method is compatible with the training data format."
+                ) from e
 
         # In-sample fitted values (for training data)
         if hasattr(self.model_instance, "predict"):  # sktime convention
