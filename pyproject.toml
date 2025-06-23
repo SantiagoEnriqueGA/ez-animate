@@ -34,7 +34,7 @@ test = [
     "pytest>=8.0",
     "pytest-cov",
     "sega_learn",
-    "sktime",
+    # "sktime",
 ]
 docs = [
     "mkdocs>=1.6",
