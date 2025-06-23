@@ -1,0 +1,262 @@
+import os
+import sys
+import unittest
+from unittest.mock import patch
+
+import matplotlib as mpl
+import numpy as np
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from tests.utils import BaseTest, suppress_print
+
+from ez_animate import (
+    ClassificationAnimation,
+    ForecastingAnimation,
+    RegressionAnimation,
+)
+from sega_learn.linear_models import LogisticRegression, Ridge
+from sega_learn.time_series.moving_average import ExponentialMovingAverage
+from sega_learn.utils import (
+    Metrics,
+    make_classification,
+    make_regression,
+    make_time_series,
+)
+
+
+class TestAnimationIntegration(BaseTest):
+    """Integration tests for animation classes."""
+
+    @classmethod
+    def setUpClass(cls):  # NOQA D201
+        """Initializes the test suite."""
+        print("\nTesting Animation Integration", end="", flush=True)
+        mpl.use("Agg")
+
+    @patch("matplotlib.animation.FuncAnimation")
+    def test_forecasting_animate(self, mock_animation):
+        """Test forecastingAnimation animate method."""
+        # Generate a synthetic time series
+        time_series = make_time_series(
+            n_samples=1,
+            n_timestamps=100,
+            n_features=1,
+            trend="linear",
+            seasonality="sine",
+            seasonality_period=10,
+            noise=0.1,
+            random_state=42,
+        ).flatten()
+
+        # Split into training and testing sets
+        train_size = int(len(time_series) * 0.8)
+        train_series = time_series[:train_size]
+        test_series = time_series[train_size:]
+        forecast_steps = len(test_series)
+
+        animator = ForecastingAnimation(
+            model=ExponentialMovingAverage,
+            train_series=train_series,
+            test_series=test_series,
+            forecast_steps=forecast_steps,
+            dynamic_parameter="alpha",
+            keep_previous=True,
+            metric_fn=[Metrics.mean_squared_error],
+        )
+
+        animator.setup_plot("Test Forecasting", "Time", "Value")
+        alpha_range = np.arange(0.01, 0.5, 0.1)
+
+        # Test animate method with mock
+        animation = animator.animate(
+            frames=alpha_range, interval=150, blit=True, repeat=False
+        )
+        self.assertEqual(animation, animator.ani)
+        mock_animation.assert_called_once()
+
+    @patch("matplotlib.animation.FuncAnimation")
+    def test_regression_animate(self, mock_animation):
+        """Test RegressionAnimation animate method."""
+        # Generate synthetic regression data
+        X, y = make_regression(n_samples=100, n_features=1, noise=0.5, random_state=42)
+
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters={"alpha": 1.0},
+            keep_previous=True,
+            metric_fn=[Metrics.mean_squared_error],
+        )
+
+        animator.setup_plot("Test Regression", "Feature", "Target")
+        max_iter_range = range(100, 1000, 100)
+
+        # Test animate method with mock
+        animation = animator.animate(
+            frames=max_iter_range, interval=150, blit=True, repeat=False
+        )
+        self.assertEqual(animation, animator.ani)
+        mock_animation.assert_called_once()
+
+    @patch("matplotlib.animation.FuncAnimation")
+    def test_classification_animate(self, mock_animation):
+        """Test ClassificationAnimation animate method."""
+        # Generate synthetic classification data
+        X, y = make_classification(
+            n_samples=100,
+            n_features=2,
+            n_redundant=0,
+            n_informative=2,
+            n_classes=2,
+            random_state=42,
+        )
+
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters={"learning_rate": 0.001},
+            keep_previous=True,
+            metric_fn=[Metrics.accuracy],
+        )
+
+        animator.setup_plot("Test Classification", "Feature 1", "Feature 2")
+        max_iter_range = range(100, 1000, 100)
+
+        # Test animate method with mock
+        animation = animator.animate(
+            frames=max_iter_range, interval=150, blit=True, repeat=False
+        )
+        self.assertEqual(animation, animator.ani)
+        mock_animation.assert_called_once()
+
+    @patch("builtins.print")
+    @patch("matplotlib.animation.FuncAnimation.save")
+    def test_save_functionality(self, mock_save, mock_print):
+        """Test the save functionality of animation classes."""
+        # Generate synthetic regression data
+        X, y = make_regression(n_samples=100, n_features=1, noise=0.5, random_state=42)
+
+        animator = RegressionAnimation(
+            model=Ridge, X=X, y=y, dynamic_parameter="max_iter"
+        )
+
+        animator.setup_plot("Test Regression", "Feature", "Target")
+
+        # Mock the animation creation
+        with patch("matplotlib.animation.FuncAnimation") as mock_animation:
+            mock_instance = mock_animation.return_value
+            animator.ani = mock_instance  # Set the animation attribute
+
+            # Test saving
+            animator.save("test.gif", writer="pillow", fps=5, dpi=100)
+            mock_instance.save.assert_called_once_with(
+                "test.gif", writer="pillow", fps=5, dpi=100
+            )
+            mock_print.assert_called_with("Animation saved successfully to test.gif.")
+
+    @patch("builtins.print")
+    @patch("matplotlib.animation.FuncAnimation.save")
+    def test_save_functionality_no_animation(self, mock_save, mock_print):
+        """Assert RuntimeError when Animation has not been created."""
+        # Generate synthetic regression data
+        X, y = make_regression(n_samples=100, n_features=1, noise=0.5, random_state=42)
+
+        animator = RegressionAnimation(
+            model=Ridge, X=X, y=y, dynamic_parameter="max_iter"
+        )
+
+        animator.setup_plot("Test Regression", "Feature", "Target")
+        with self.assertRaises(RuntimeError):
+            # Attempt to save without creating an animation
+            animator.save("test.gif", writer="pillow", fps=5, dpi=100)
+
+        # If test.gif exists, remove it
+        if os.path.exists("test.gif"):
+            os.remove("test.gif")
+
+    @patch("builtins.print")
+    def test_save_functionality_invalid_writer(self, mock_print):
+        """Assert ValueError when an invalid writer is specified."""
+        # Generate synthetic regression data
+        X, y = make_regression(n_samples=100, n_features=1, noise=0.5, random_state=42)
+
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters={"alpha": 1.0},
+            keep_previous=True,
+            metric_fn=[Metrics.mean_squared_error],
+        )
+
+        animator.setup_plot("Test Regression", "Feature", "Target")
+        max_iter_range = range(100, 1000, 100)
+
+        # Test animate method with mock
+        animator.animate(frames=max_iter_range, interval=150, blit=True, repeat=False)
+
+        with self.assertRaises(Exception) and suppress_print():
+            # Attempt to save with an invalid writer
+            animator.save("test.gif", writer="invalid_writer", fps=5, dpi=100)
+
+    @patch("matplotlib.pyplot.show")
+    @patch("builtins.print")
+    def test_show_success(self, mock_print, mock_show):
+        """Test that show() displays the animation and prints success message."""
+        X, y = make_regression(n_samples=10, n_features=1, noise=0.1, random_state=0)
+        animator = RegressionAnimation(
+            model=Ridge, X=X, y=y, dynamic_parameter="max_iter"
+        )
+        animator.setup_plot("Test", "X", "y")
+        animator.ani = object()  # Simulate animation created
+        animator.show()
+        mock_show.assert_called_once()
+        mock_print.assert_any_call("Animation displayed.")
+
+    def test_show_no_animation(self):
+        """Test that show() raises RuntimeError if animation is not created."""
+        X, y = make_regression(n_samples=10, n_features=1, noise=0.1, random_state=0)
+        animator = RegressionAnimation(
+            model=Ridge, X=X, y=y, dynamic_parameter="max_iter"
+        )
+        animator.setup_plot("Test", "X", "y")
+        with self.assertRaises(RuntimeError):
+            animator.show()
+
+    def test_show_no_figure(self):
+        """Test that show() raises RuntimeError if plot is not set up."""
+        X, y = make_regression(n_samples=10, n_features=1, noise=0.1, random_state=0)
+        animator = RegressionAnimation(
+            model=Ridge, X=X, y=y, dynamic_parameter="max_iter"
+        )
+        animator.ani = object()  # Simulate animation created
+        animator.fig = None
+        with self.assertRaises(RuntimeError):
+            animator.show()
+
+    @patch("matplotlib.pyplot.show", side_effect=Exception("show error"))
+    @patch("matplotlib.pyplot.close")
+    @patch("builtins.print")
+    def test_show_handles_exception(self, mock_print, mock_close, mock_show):
+        """Test that show() handles exceptions and closes the figure."""
+        X, y = make_regression(n_samples=10, n_features=1, noise=0.1, random_state=0)
+        animator = RegressionAnimation(
+            model=Ridge, X=X, y=y, dynamic_parameter="max_iter"
+        )
+        animator.setup_plot("Test", "X", "y")
+        animator.ani = object()  # Simulate animation created
+        animator.show()
+        mock_print.assert_any_call("Error showing animation: show error")
+        mock_close.assert_called_once_with(animator.fig)
+
+
+if __name__ == "__main__":
+    unittest.main()
