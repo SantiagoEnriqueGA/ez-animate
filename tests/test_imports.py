@@ -48,11 +48,11 @@ class TestImports(BaseTest):
 
     def test_imports_from_animator(self):
         """Test that animation classes can be imported correctly."""
-        from ez_animate.animator import (
+        from ez_animate import (
             ClassificationAnimation,
             ForecastingAnimation,
             RegressionAnimation,
-        )  # noqa: I001
+        )
 
         self.assertIsNotNone(ClassificationAnimation)
         self.assertIsNotNone(ForecastingAnimation)

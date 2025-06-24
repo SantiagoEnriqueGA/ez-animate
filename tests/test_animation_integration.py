@@ -36,7 +36,7 @@ class TestAnimationBase(BaseTest):
 
     def test_abstract_methods_raise_type_error(self):
         """Test that instantiating AnimationBase directly raises TypeError due to abstract methods."""
-        from ez_animate.animator import AnimationBase
+        from ez_animate.animation_base import AnimationBase
 
         with self.assertRaises(TypeError):
             AnimationBase(
@@ -50,7 +50,7 @@ class TestAnimationBase(BaseTest):
 
     def test_abstract_methods_raise_not_implemented(self):
         """Test that calling update_model and update_plot on a dummy subclass raises NotImplementedError."""
-        from ez_animate.animator import AnimationBase
+        from ez_animate.animation_base import AnimationBase
 
         class DummyAnimation(AnimationBase):
             def update_model(self, frame):
