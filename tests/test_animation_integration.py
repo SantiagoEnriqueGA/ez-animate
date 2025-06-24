@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import patch
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt  # Added for closing figures
 import numpy as np
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -22,6 +23,67 @@ from sega_learn.utils import (
     make_regression,
     make_time_series,
 )
+
+
+class TestAnimationBase(BaseTest):
+    """Base class for animation tests."""
+
+    @classmethod
+    def setUpClass(cls):  # NOQA D201
+        """Initializes the test suite."""
+        print("\nTesting Animation Base", end="", flush=True)
+        mpl.use("Agg")
+
+    def test_abstract_methods_raise_type_error(self):
+        """Test that instantiating AnimationBase directly raises TypeError due to abstract methods."""
+        from ez_animate.animator import AnimationBase
+
+        with self.assertRaises(TypeError):
+            AnimationBase(
+                model=None,
+                train_series=[1],
+                test_series=[1],
+                dynamic_parameter="param",
+                static_parameters={},
+                keep_previous=False,
+            )
+
+    def test_abstract_methods_raise_not_implemented(self):
+        """Test that calling update_model and update_plot on a dummy subclass raises NotImplementedError."""
+        from ez_animate.animator import AnimationBase
+
+        class DummyAnimation(AnimationBase):
+            def update_model(self, frame):
+                return super().update_model(frame)
+
+            def update_plot(self, frame):
+                return super().update_plot(frame)
+
+        dummy = DummyAnimation(
+            model=None,
+            train_series=[1],
+            test_series=[1],
+            dynamic_parameter="param",
+            static_parameters={},
+            keep_previous=False,
+        )
+        with self.assertRaises(NotImplementedError):
+            dummy.update_model(0)
+        with self.assertRaises(NotImplementedError):
+            dummy.update_plot(0)
+
+    def test_save_no_animation(self):
+        """Test that save() raises an error if no animation exists."""
+        animator = ForecastingAnimation(
+            model=ExponentialMovingAverage,
+            train_series=np.array([1, 2, 3]),
+            test_series=np.array([4, 5, 6]),
+            forecast_steps=3,
+            dynamic_parameter="alpha",
+        )
+        with self.assertRaises(RuntimeError):
+            animator.save("test_animation.mp4")
+        plt.close(animator.fig)
 
 
 class TestAnimationIntegration(BaseTest):
@@ -73,6 +135,7 @@ class TestAnimationIntegration(BaseTest):
         )
         self.assertEqual(animation, animator.ani)
         mock_animation.assert_called_once()
+        plt.close(animator.fig)
 
     @patch("matplotlib.animation.FuncAnimation")
     def test_regression_animate(self, mock_animation):
@@ -100,6 +163,7 @@ class TestAnimationIntegration(BaseTest):
         )
         self.assertEqual(animation, animator.ani)
         mock_animation.assert_called_once()
+        plt.close(animator.fig)
 
     @patch("matplotlib.animation.FuncAnimation")
     def test_classification_animate(self, mock_animation):
@@ -134,6 +198,7 @@ class TestAnimationIntegration(BaseTest):
         )
         self.assertEqual(animation, animator.ani)
         mock_animation.assert_called_once()
+        plt.close(animator.fig)
 
     @patch("builtins.print")
     @patch("matplotlib.animation.FuncAnimation.save")
@@ -159,6 +224,7 @@ class TestAnimationIntegration(BaseTest):
                 "test.gif", writer="pillow", fps=5, dpi=100
             )
             mock_print.assert_called_with("Animation saved successfully to test.gif.")
+        plt.close(animator.fig)
 
     @patch("builtins.print")
     @patch("matplotlib.animation.FuncAnimation.save")
@@ -179,6 +245,7 @@ class TestAnimationIntegration(BaseTest):
         # If test.gif exists, remove it
         if os.path.exists("test.gif"):
             os.remove("test.gif")
+        plt.close(animator.fig)
 
     @patch("builtins.print")
     def test_save_functionality_invalid_writer(self, mock_print):
@@ -206,6 +273,35 @@ class TestAnimationIntegration(BaseTest):
         with self.assertRaises(Exception) and suppress_print():
             # Attempt to save with an invalid writer
             animator.save("test.gif", writer="invalid_writer", fps=5, dpi=100)
+        plt.close(animator.fig)
+
+    @patch("builtins.print")
+    def test_save_functionality_invalid_filename(self, mock_print):
+        """Assert ValueError when an invalid filename is specified."""
+        # Generate synthetic regression data
+        X, y = make_regression(n_samples=100, n_features=1, noise=0.5, random_state=42)
+
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters={"alpha": 1.0},
+            keep_previous=True,
+            metric_fn=[Metrics.mean_squared_error],
+        )
+
+        animator.setup_plot("Test Regression", "Feature", "Target")
+        max_iter_range = range(100, 1000, 100)
+
+        # Test animate method with mock
+        animator.animate(frames=max_iter_range, interval=150, blit=True, repeat=False)
+
+        with self.assertRaises(Exception) and suppress_print():
+            # Attempt to save with an invalid writer
+            animator.save("abc/test.xyz", writer="invalid_writer", fps=5, dpi=100)
+        plt.close(animator.fig)
 
     @patch("matplotlib.pyplot.show")
     @patch("builtins.print")
@@ -220,6 +316,7 @@ class TestAnimationIntegration(BaseTest):
         animator.show()
         mock_show.assert_called_once()
         mock_print.assert_any_call("Animation displayed.")
+        plt.close(animator.fig)
 
     def test_show_no_animation(self):
         """Test that show() raises RuntimeError if animation is not created."""
@@ -230,6 +327,7 @@ class TestAnimationIntegration(BaseTest):
         animator.setup_plot("Test", "X", "y")
         with self.assertRaises(RuntimeError):
             animator.show()
+        plt.close(animator.fig)
 
     def test_show_no_figure(self):
         """Test that show() raises RuntimeError if plot is not set up."""
@@ -256,6 +354,7 @@ class TestAnimationIntegration(BaseTest):
         animator.show()
         mock_print.assert_any_call("Error showing animation: show error")
         mock_close.assert_called_once_with(animator.fig)
+        plt.close(animator.fig)
 
 
 if __name__ == "__main__":

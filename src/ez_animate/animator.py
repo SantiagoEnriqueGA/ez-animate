@@ -116,12 +116,12 @@ class AnimationBase(ABC):
     @abstractmethod
     def update_model(self, frame):
         """Abstract method to update the model for a given frame. Must be implemented by subclasses."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def update_plot(self, frame):
         """Abstract method to update the plot for a given frame.Must be implemented by subclasses."""
-        pass
+        raise NotImplementedError
 
     def animate(self, frames, interval=150, blit=True, repeat=False):
         """Create the animation.

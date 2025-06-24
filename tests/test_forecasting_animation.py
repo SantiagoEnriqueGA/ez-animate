@@ -234,7 +234,7 @@ class TestforecastingAnimation(BaseTest):
             dynamic_parameter="alpha",
             show_legend=False,
         )
-        animator.setup_plot("Test Forecasting", "Time", "Value")
+        animator.setup_plot("Test Forecasting", "Time", "Value", legend_loc=None)
         self.assertIsNotNone(animator.fig)
         self.assertIsNotNone(animator.ax)
         self.assertEqual(animator.ax.get_title(), "Test Forecasting")

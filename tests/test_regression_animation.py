@@ -53,6 +53,112 @@ class TestRegressionAnimation(BaseTest):
         self.assertIsInstance(animator.X_test, np.ndarray)
         self.assertIsInstance(animator.y_test, np.ndarray)
 
+    def test_init_with_invalid_Xy(self):
+        """Test initialization with invalid X or y."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=None,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+            )
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=None,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+            )
+
+    def test_init_with_invalid_test_size(self):
+        """Test initialization with invalid test_size."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=-0.1,
+                dynamic_parameter="max_iter",
+            )
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=1.5,
+                dynamic_parameter="max_iter",
+            )
+
+    def test_init_with_invalid_dynamic_parameter(self):
+        """Test initialization with invalid dynamic_parameter."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter=3,
+            )
+
+    def test_init_with_invalid_static_parameters(self):
+        """Test initialization with invalid static_parameters."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+                static_parameters=["invalid_param"],
+            )
+
+    def test_init_with_invalid_keep_previous(self):
+        """Test initialization with invalid keep_previous."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+                keep_previous="invalid_value",
+            )
+
+    def test_init_with_invalid_max_previous(self):
+        """Test initialization with invalid max_previous."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+                max_previous=1.5,
+            )
+
+    def test_init_with_invalid_pca_components(self):
+        """Test initialization with invalid pca_components."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+                pca_components=-1,
+            )
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+                pca_components=1.5,
+            )
+
     def test_init_with_pca(self):
         """Test initialization with PCA for multi-feature data."""
         # Create multi-feature data
@@ -142,6 +248,28 @@ class TestRegressionAnimation(BaseTest):
         self.assertIsNotNone(animator.predicted_line)
         plt.close(animator.fig)
 
+    def test_setup_plot_with_pca(self):
+        """Test setup_plot with PCA."""
+        # X that requires PCA
+        X = np.random.rand(100, 5)
+        y = np.random.rand(100)
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            pca_components=1,
+        )
+        animator.setup_plot("Test Regression with PCA", "Feature", "Target")
+        self.assertIsNotNone(animator.fig)
+        self.assertIsNotNone(animator.ax)
+        self.assertEqual(animator.ax.get_title(), "Test Regression with PCA")
+        self.assertIsNotNone(animator.scatter_points)
+        self.assertIsNotNone(animator.scatter_points_test)
+        self.assertIsNotNone(animator.predicted_line)
+        plt.close(animator.fig)
+
     def test_update_model(self):
         """Test update_model with valid frame parameter."""
         animator = RegressionAnimation(
@@ -171,6 +299,28 @@ class TestRegressionAnimation(BaseTest):
             dynamic_parameter="max_iter",
             static_parameters={"alpha": 1.0},
             metric_fn=[Metrics.mean_squared_error, Metrics.r_squared],
+        )
+        with suppress_print():
+            animator.setup_plot("Test Regression", "Feature", "Target")
+            animator.update_model(1000)
+
+            # Check that update_plot returns a tuple of artists
+            artists = animator.update_plot(1000)
+
+        self.assertIsInstance(artists, tuple)
+        self.assertEqual(len(artists), 1)
+        self.assertIsInstance(artists[0], plt.Line2D)
+        plt.close(animator.fig)
+
+    def test_update_plot_with_no_metrics(self):
+        """Test update_plot without metrics."""
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters={"alpha": 1.0},
         )
         with suppress_print():
             animator.setup_plot("Test Regression", "Feature", "Target")
