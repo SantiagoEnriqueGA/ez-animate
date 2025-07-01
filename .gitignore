@@ -20,3 +20,6 @@ wheels/
 .coverage
 coverage.xml
 htmlcov/
+
+# MkDocs site files
+site/
