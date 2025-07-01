@@ -8,6 +8,7 @@ A high-level, declarative Python package for creating common Matplotlib animatio
 - [Features](#features)
 - [Installation](#installation)
 - [Quickstart](#quickstart)
+<!-- - [Full Documentation](#full-documentation) -->
 - [Development/Contributing](#developmentcontributing)
 
 
@@ -40,8 +41,39 @@ pip install ez-animate
 ## Quickstart
 
 ```python
-TBD
+from ez_animate import RegressionAnimation
+
+# Create and run the animation
+animator = RegressionAnimation(
+    model=Lasso,    # Scikit-learn or sega_learn model class
+    X=X,
+    y=y,
+    test_size=0.25,
+    dynamic_parameter="alpha",
+    static_parameters={"max_iter": 1, "fit_intercept": True},
+    keep_previous=True,
+    metric_fn=Metrics.mean_squared_error,
+)
+
+# Set up the plot
+animator.setup_plot(
+    title="Regression Animation",
+    xlabel="Feature Coefficient",
+    ylabel="Target Value",
+)
+
+# Create the animation
+animator.animate(frames=np.arange(0.01, 1.0, 0.01))
+
+# Show and save the animation
+animator.show()
+animator.save("regression_animation.gif")
 ```
+
+<!-- Update link here once live -->
+<!-- ## Full Documentation
+
+See the [MkDocs documentation](https://ez-animate.readthedocs.io/) for complete usage instructions, API references, and examples. -->
 
 ## Development/Contributing
 
