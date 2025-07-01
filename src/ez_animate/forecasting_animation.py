@@ -108,11 +108,11 @@ class ForecastingAnimation(AnimationBase):
                 f"{self.model.__name__} needs a 'fit' method to train the model."
             )
         try:
-            self.model_instance.fit(self.train_data)
+            self.fitted_values = self.model_instance.fit(self.train_data)
         except TypeError:
             try:
                 # Where model.fit requires (X,y) format
-                self.model_instance.fit(
+                self.fitted_values = self.model_instance.fit(
                     np.arange(len(self.train_data)).reshape(-1, 1),
                     self.train_data,
                 )
@@ -130,7 +130,7 @@ class ForecastingAnimation(AnimationBase):
                 )
             except Exception:
                 self.fitted_values = np.array(self.train_data)
-        else:
+        elif self.fitted_values is None:
             self.fitted_values = np.array(self.train_data)
 
         # Forecast for test set
