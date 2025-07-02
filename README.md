@@ -1,3 +1,35 @@
+<!-- Badges -->
+<p align="left">
+  <a href="https://github.com/SantiagoEnriqueGA/ez-animate/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/SantiagoEnriqueGA/ez-animate.svg" alt="License">
+  </a>
+  <a href="https://github.com/SantiagoEnriqueGA/ez-animate/actions">
+    <img src="https://github.com/SantiagoEnriqueGA/ez-animate/workflows/CI/badge.svg" alt="Build Status">
+  </a>
+  <!-- Uncomment after PyPI release -->
+  <!-- <a href="https://pypi.org/project/ez-animate/">
+    <img src="https://img.shields.io/pypi/v/ez-animate.svg" alt="PyPI Version">
+  <a href="https://pepy.tech/project/ez-animate">
+    <img src="https://static.pepy.tech/badge/ez-animate" alt="Downloads">
+  </a>
+  </a>
+  <a href="https://pypi.org/project/ez-animate/">
+    <img src="https://img.shields.io/pypi/pyversions/ez-animate.svg" alt="Python Versions">
+  </a> -->
+  <a href="https://codecov.io/gh/SantiagoEnriqueGA/ez-animate">
+    <img src="https://codecov.io/gh/SantiagoEnriqueGA/ez-animate/branch/master/graph/badge.svg" alt="Code Coverage">
+  </a>
+  <a href="https://github.com/charliermarsh/ruff">
+    <img src="https://img.shields.io/badge/code%20style-ruff-brightgreen.svg" alt="Code style: ruff">
+  </a>
+    <a href="https://ez-animate.readthedocs.io/">
+    <img src="https://img.shields.io/badge/docs%20live-MkDocs-blue" alt="Docs: MkDocs">
+  </a>
+  <a href="https://santiagoenriquega.github.io/ez-animate/">
+    <img src="https://img.shields.io/website?down_color=red&down_message=offline&up_color=brightgreen&up_message=online&url=https%3A%2F%2Fsantiagoenriquega.github.io%2Fez-animate" alt="Site Status">
+  </a>
+</p>
+
 # ez-animate
 
 A high-level, declarative Python package for creating common Matplotlib animations with minimal boilerplate code.
@@ -72,7 +104,7 @@ animator.save("regression_animation.gif")
 
 ## Full Documentation
 
-See the [documentation site](https://ez-animate.readthedocs.io/) for complete usage instructions, API references, and examples.
+See the [documentation site](https://santiagoenriquega.github.io/ez-animate/) for complete usage instructions, API references, and examples.
 ## Development/Contributing
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for full development and contributing guidelines.
