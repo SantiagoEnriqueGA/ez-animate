@@ -41,6 +41,7 @@ class TestImports(BaseTest):
             "ForecastingAnimation",
             "RegressionAnimation",
             "ClassificationAnimation",
+            "ClusteringAnimation",
             "PCA",
             "train_test_split",
         ]
