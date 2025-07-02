@@ -21,8 +21,9 @@
   </a>
   <a href="https://github.com/charliermarsh/ruff">
     <img src="https://img.shields.io/badge/code%20style-ruff-brightgreen.svg" alt="Code style: ruff">
+  </a>
   <a href="https://santiagoenriquega.github.io/ez-animate/">
-    <img src="https://img.shields.io/website?down_color=red&down_message=offline&up_color=brightgreen&up_message=MkDocs online&url=https%3A%2F%2Fsantiagoenriquega.github.io%2Fez-animate" alt="Site Status">
+    <img src="https://img.shields.io/website?down_color=red&down_message=offline&up_color=brightgreen&up_message=MkDocs&url=https%3A%2F%2Fsantiagoenriquega.github.io%2Fez-animate" alt="Site Status">
   </a>
 </p>
 
