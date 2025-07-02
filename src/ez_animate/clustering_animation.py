@@ -39,6 +39,24 @@ class ClusteringAnimation(AnimationBase):
             pca_components: Number of PCA components for dimensionality reduction.
             **kwargs: Additional customization options.
         """
+        # Input validation
+        if data is None or len(data) == 0:
+            raise ValueError("Input data cannot be None or empty.")
+        if not isinstance(data, np.ndarray):
+            raise TypeError("Input data must be a numpy array.")
+        if labels is not None and not isinstance(labels, (np.ndarray, list)):
+            raise TypeError("Labels must be a numpy array or list.")
+        if not isinstance(dynamic_parameter, str):
+            raise ValueError("dynamic_parameter must be a string.")
+        if not isinstance(static_parameters, (dict, type(None))):
+            raise ValueError("static_parameters must be a dictionary or None.")
+        if not isinstance(keep_previous, bool):
+            raise ValueError("keep_previous must be a boolean.")
+        if not isinstance(pca_components, (int, type(None))) or pca_components < 1:
+            raise ValueError("pca_components must be an integer greater than 0.")
+        if trace_centers is not None and not isinstance(trace_centers, bool):
+            raise ValueError("trace_centers must be a boolean.")
+
         self.scaler_instance = scaler
         self.pca_instance = None
         self.needs_pca = False
@@ -154,7 +172,6 @@ class ClusteringAnimation(AnimationBase):
                     color=self.colors[i],
                     label=f"Test Class {label}",
                     alpha=0.3,
-                    edgecolors="k",
                     marker="x",
                 )
 
@@ -173,7 +190,6 @@ class ClusteringAnimation(AnimationBase):
                 self.X_test[:, 1],
                 c="lightgray",
                 alpha=0.5,
-                edgecolors="k",
                 s=50,
                 marker="x",
             )
@@ -251,7 +267,14 @@ class ClusteringAnimation(AnimationBase):
 
         # Plot the points colored by their cluster assignment
         n_clusters = len(np.unique(cluster_labels))
-        cmap = plt.cm.get_cmap("tab10", n_clusters)
+
+        # Use the recommended way to get a colormap in Matplotlib >=3.7
+        try:
+            cmap = plt.colormaps.get_cmap("tab10")
+        except AttributeError:
+            # Fallback for older matplotlib
+            cmap = plt.cm.get_cmap("tab10")
+
         self.cluster_assignments_plot = []
         for i in range(n_clusters):
             mask = cluster_labels == i
