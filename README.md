@@ -8,7 +8,7 @@ A high-level, declarative Python package for creating common Matplotlib animatio
 - [Features](#features)
 - [Installation](#installation)
 - [Quickstart](#quickstart)
-<!-- - [Full Documentation](#full-documentation) -->
+- [Full Documentation](#full-documentation)
 - [Development/Contributing](#developmentcontributing)
 
 
@@ -70,11 +70,9 @@ animator.show()
 animator.save("regression_animation.gif")
 ```
 
-<!-- Update link here once live -->
-<!-- ## Full Documentation
+## Full Documentation
 
-See the [MkDocs documentation](https://ez-animate.readthedocs.io/) for complete usage instructions, API references, and examples. -->
-
+See the [documentation site](https://ez-animate.readthedocs.io/) for complete usage instructions, API references, and examples.
 ## Development/Contributing
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for full development and contributing guidelines.
