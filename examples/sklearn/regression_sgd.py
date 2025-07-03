@@ -44,8 +44,8 @@ animator.setup_plot(
 )
 
 # Create and save the animation
-alpha_range = np.arange(1, 100, 1)
-animator.animate(frames=alpha_range, interval=150, blit=False, repeat=True)
+iter_range = np.arange(1, 100, 1)
+animator.animate(frames=iter_range, interval=150, blit=False, repeat=True)
 # animator.save(
 #     filename="animator_sgd.gif",
 #     writer="pillow",

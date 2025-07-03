@@ -149,7 +149,6 @@ class AnimationBase(ABC):
             self.metric_ax.relim()
             self.metric_ax.autoscale_view()
 
-
     @abstractmethod
     def update_model(self, frame):
         """Abstract method to update the model for a given frame. Must be implemented by subclasses."""
