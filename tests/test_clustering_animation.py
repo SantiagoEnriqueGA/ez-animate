@@ -14,12 +14,37 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from tests.utils import BaseTest, suppress_print
 
 from ez_animate import ClusteringAnimation
-from sklearn.cluster import KMeans
+from sega_learn import DBSCAN as SegaDBSCAN
+from sega_learn import KMeans as SegaKMeans
+from sklearn.cluster import DBSCAN, KMeans
 from sklearn.datasets import make_blobs
+from sklearn.metrics import accuracy_score, calinski_harabasz_score, silhouette_score
 
 
 class TestClusteringAnimation(BaseTest):
     """Unit test for the ClusteringAnimation class."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test class (set matplotlib backend and suppress legend warnings)."""
+        print("\nTesting ClusteringAnimation Class", end="", flush=True)
+        mpl.use("Agg")
+        # Suppress UserWarning about no artists with labels found to put in legend
+        warnings.filterwarnings(
+            "ignore",
+            message="No artists with labels found to put in legend*",
+            category=UserWarning,
+        )
+
+    def setUp(self):
+        """Generate synthetic clustering data for each test."""
+        self.X, self.y = make_blobs(
+            n_samples=100, n_features=2, centers=3, random_state=42
+        )
+
+    def tearDown(self):
+        """Cleans up after each test."""
+        plt.close("all")
 
     def test_dummy_labels_created_when_labels_none(self):
         """Test that dummy labels are created when labels=None."""
@@ -240,26 +265,6 @@ class TestClusteringAnimation(BaseTest):
         self.assertIn("Silhouette_score", animator.ax.get_title())
         plt.close(animator.fig)
 
-    """Unit test for the ClusteringAnimation class."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Set up the test class (set matplotlib backend and suppress legend warnings)."""
-        print("\nTesting ClusteringAnimation Class", end="", flush=True)
-        mpl.use("Agg")
-        # Suppress UserWarning about no artists with labels found to put in legend
-        warnings.filterwarnings(
-            "ignore",
-            message="No artists with labels found to put in legend*",
-            category=UserWarning,
-        )
-
-    def setUp(self):
-        """Generate synthetic clustering data for each test."""
-        self.X, self.y = make_blobs(
-            n_samples=100, n_features=2, centers=3, random_state=42
-        )
-
     def test_init(self):
         """Test ClusteringAnimation initialization with valid parameters."""
         animator = ClusteringAnimation(
@@ -353,6 +358,51 @@ class TestClusteringAnimation(BaseTest):
                 pca_components=0,
             )
 
+    def test_init_with_invalid_trace_centers(self):
+        """Test initialization with invalid trace_centers input."""
+        with self.assertRaises(ValueError):
+            ClusteringAnimation(
+                model=KMeans,
+                data=self.X,
+                labels=self.y,
+                test_size=0.25,
+                dynamic_parameter="n_init",
+                trace_centers="invalid_value",
+            )
+
+    def test_init_with_scaler(self):
+        """Test initialization with a scaler."""
+        from sega_learn import Scaler
+
+        scaler = Scaler()
+        with suppress_print():
+            animator = ClusteringAnimation(
+                model=KMeans,
+                data=self.X,
+                labels=self.y,
+                test_size=0.25,
+                dynamic_parameter="n_init",
+                static_parameters={"n_clusters": 3},
+                scaler=scaler,
+            )
+        self.assertIsInstance(animator.scaler_instance, Scaler)
+
+    def test_pca_components_more_than_2(self):
+        """Test initialization with pca_components > 2."""
+        # data.shape[1] > 2:
+        X = np.random.rand(100, 5)  # 5 features
+        y = np.random.randint(0, 3, size=100)
+        with suppress_print():
+            animation = ClusteringAnimation(
+                model=KMeans,
+                data=X,
+                labels=y,
+                test_size=0.25,
+                dynamic_parameter="n_init",
+                pca_components=3,
+            )
+        self.assertEqual(animation.pca_instance.n_components, 2)
+
     def test_setup_plot(self):
         """Test setup_plot with valid parameters."""
         animator = ClusteringAnimation(
@@ -369,7 +419,7 @@ class TestClusteringAnimation(BaseTest):
         self.assertEqual(animator.ax.get_title(), "Test Clustering")
         plt.close(animator.fig)
 
-    def test_update_model(self):
+    def test_update_model_sklearn(self):
         """Test update_model with valid frame parameter."""
         animator = ClusteringAnimation(
             model=KMeans,
@@ -384,6 +434,73 @@ class TestClusteringAnimation(BaseTest):
         self.assertIsInstance(animator.model_instance, KMeans)
         self.assertEqual(animator.model_instance.n_init, 10)
         self.assertEqual(animator.model_instance.n_clusters, 3)
+
+    def test_update_model_sklearn_2(self):
+        """Test update_model with valid frame parameter, DBSCAN model."""
+        animator = ClusteringAnimation(
+            model=DBSCAN,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="eps",
+            static_parameters={"min_samples": 5},
+        )
+        with suppress_print():
+            animator.update_model(0.5)
+        self.assertIsInstance(animator.model_instance, DBSCAN)
+        self.assertEqual(animator.model_instance.eps, 0.5)
+        self.assertEqual(animator.model_instance.min_samples, 5)
+
+    def test_update_model_pca(self):
+        """Test update_model with PCA applied."""
+        X_highdim, y_highdim = make_blobs(
+            n_samples=100, n_features=5, centers=3, random_state=42
+        )
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=X_highdim,
+            labels=y_highdim,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+        )
+        with suppress_print():
+            animator.update_model(10)
+        self.assertIsInstance(animator.model_instance, KMeans)
+        self.assertEqual(animator.model_instance.n_init, 10)
+        self.assertEqual(animator.model_instance.n_clusters, 3)
+
+    def test_update_model_sega_learn(self):
+        """Test update_model with sega_learn model."""
+        animator = ClusteringAnimation(
+            model=SegaKMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters={"n_clusters": 3},
+        )
+        with suppress_print():
+            animator.update_model(10)
+        self.assertIsInstance(animator.model_instance, SegaKMeans)
+        self.assertEqual(animator.model_instance.max_iter, 10)
+        self.assertEqual(animator.model_instance.n_clusters, 3)
+
+    def test_update_model_sega_learn_2(self):
+        """Test update_model with sega_learn DBSCAN model."""
+        animator = ClusteringAnimation(
+            model=SegaDBSCAN,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="eps",
+            static_parameters={"min_samples": 5},
+        )
+        with suppress_print():
+            animator.update_model(0.5)
+        self.assertIsInstance(animator.model_instance, SegaDBSCAN)
+        self.assertEqual(animator.model_instance.eps, 0.5)
+        self.assertEqual(animator.model_instance.min_samples, 5)
 
     def test_update_plot(self):
         """Test update_plot with valid parameters and labels."""
@@ -440,6 +557,43 @@ class TestClusteringAnimation(BaseTest):
         self.assertGreaterEqual(len(artists), 1)
         plt.close(animator.fig)
 
+    def test_update_plot_with_non_clustering_metric(self):
+        """Test update_plot with a non-clustering metric."""
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+            metric_fn=accuracy_score
+        )
+        with suppress_print():
+            animator.setup_plot("Test Clustering", "Feature 1", "Feature 2")
+            animator.update_model(10)
+            artists = animator.update_plot(10)
+        self.assertIsInstance(artists, tuple)
+        self.assertGreaterEqual(len(artists), 1)
+        plt.close(animator.fig)
+
+    def test_update_plot_with_multiple_metrics(self):
+        """Test update_plot with multiple metrics."""
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+            metric_fn=[silhouette_score, calinski_harabasz_score, accuracy_score]
+        )
+        with suppress_print():
+            animator.setup_plot("Test Clustering", "Feature 1", "Feature 2")
+            animator.update_model(10)
+            artists = animator.update_plot(10)
+        self.assertIsInstance(artists, tuple)
+        self.assertGreaterEqual(len(artists), 1)
+        plt.close(animator.fig)
 
 if __name__ == "__main__":
     unittest.main()

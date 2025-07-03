@@ -51,6 +51,7 @@ class TestImports(BaseTest):
         """Test that animation classes can be imported correctly."""
         from ez_animate import (
             ClassificationAnimation,
+            ClusteringAnimation,
             ForecastingAnimation,
             RegressionAnimation,
         )
@@ -58,6 +59,7 @@ class TestImports(BaseTest):
         self.assertIsNotNone(ClassificationAnimation)
         self.assertIsNotNone(ForecastingAnimation)
         self.assertIsNotNone(RegressionAnimation)
+        self.assertIsNotNone(ClusteringAnimation)
 
     def test_imports_from_utils(self):
         """Test that utility functions can be imported correctly."""
@@ -71,6 +73,7 @@ class TestImports(BaseTest):
         self.assertIsNotNone(ForecastingAnimation)
         self.assertIsNotNone(RegressionAnimation)
         self.assertIsNotNone(ClassificationAnimation)
+        self.assertIsNotNone(ClusteringAnimation)
         self.assertIsNotNone(PCA)
         self.assertIsNotNone(train_test_split)
 
