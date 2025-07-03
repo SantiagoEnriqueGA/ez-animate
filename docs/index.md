@@ -12,7 +12,13 @@ See the navigation for installation, usage, API, and contribution details.
 
 ## Example Animations
 ### Regression Animation with Lasso
+This animation demonstrates Lasso regression, showing how the model fits the data as the *alpha* parameter (regularization strength) changes dynamically.
 ![Lasso Regression Animation](plots/animator_lasso.gif)
 
 ### Exponential Moving Average Forecast Animation
+This animation illustrates how the Exponential Moving Average (EMA) forecast evolves over time, highlighting the smoothing effect of different *alpha* values.
 ![Exponential Moving Average Forecast Animation](plots/animator_ema_forecast.gif)
+
+### Clustering Animation with KMeans
+This animation visualizes KMeans clustering, showing how the centroids and clusters change as the number of iterations increases, showcasing the algorithm's convergence process.
+![KMeans Clustering Animation](plots/animator_kmeans.gif)
