@@ -265,7 +265,8 @@ class ClusteringAnimation(AnimationBase):
                     f"{self.model.__name__} must have a 'predict' method or 'labels_' attribute after fitting."
                 ) from None
 
-        # Plot the points colored by their cluster assignment
+
+        # Plot the points colored by their cluster assignment, distinguishing X_train and X_test
         n_clusters = len(np.unique(cluster_labels))
 
         # Use the recommended way to get a colormap in Matplotlib >=3.7
@@ -276,18 +277,35 @@ class ClusteringAnimation(AnimationBase):
             cmap = plt.cm.get_cmap("tab10")
 
         self.cluster_assignments_plot = []
+        n_train = self.X_train.shape[0]
+        _n_test = self.X_test.shape[0]
         for i in range(n_clusters):
-            mask = cluster_labels == i
-            scatter = self.ax.scatter(
-                all_data[mask, 0],
-                all_data[mask, 1],
-                color=cmap(i),
-                label=f"Cluster {i}",
-                alpha=0.7,
-                edgecolors="k",
-                zorder=2,
-            )
-            self.cluster_assignments_plot.append(scatter)
+            # Mask for X_train
+            mask_train = (cluster_labels[:n_train] == i)
+            if np.any(mask_train):
+                scatter_train = self.ax.scatter(
+                    self.X_train[mask_train, 0],
+                    self.X_train[mask_train, 1],
+                    color=cmap(i),
+                    label=f"Cluster {i} (train)",
+                    alpha=0.7,
+                    edgecolors="k",
+                    zorder=2,
+                )
+                self.cluster_assignments_plot.append(scatter_train)
+            # Mask for X_test
+            mask_test = (cluster_labels[n_train:] == i)
+            if np.any(mask_test):
+                scatter_test = self.ax.scatter(
+                    self.X_test[mask_test, 0],
+                    self.X_test[mask_test, 1],
+                    color=cmap(i),
+                    label=f"Cluster {i} (test)",
+                    alpha=0.7,
+                    marker="x",
+                    zorder=2,
+                )
+                self.cluster_assignments_plot.append(scatter_test)
 
         # Plot cluster centers if available
         self.cluster_centers_plot = []
