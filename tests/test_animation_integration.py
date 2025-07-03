@@ -12,9 +12,11 @@ from tests.utils import BaseTest, suppress_print
 
 from ez_animate import (
     ClassificationAnimation,
+    ClusteringAnimation,
     ForecastingAnimation,
     RegressionAnimation,
 )
+from sega_learn.clustering import KMeans
 from sega_learn.linear_models import LogisticRegression, Ridge
 from sega_learn.time_series.moving_average import ExponentialMovingAverage
 from sega_learn.utils import (
@@ -195,6 +197,41 @@ class TestAnimationIntegration(BaseTest):
         # Test animate method with mock
         animation = animator.animate(
             frames=max_iter_range, interval=150, blit=True, repeat=False
+        )
+        self.assertEqual(animation, animator.ani)
+        mock_animation.assert_called_once()
+        plt.close(animator.fig)
+
+    @patch("matplotlib.animation.FuncAnimation")
+    def test_clustering_animate(self, mock_animation):
+        """Test ClusteringAnimation animate method."""
+        # Generate synthetic clustering data
+        X, y = make_classification(
+            n_samples=100,
+            n_features=2,
+            n_redundant=0,
+            n_informative=2,
+            n_classes=3,
+            random_state=42,
+        )
+
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=X,
+            labels=y,
+            test_size=0.25,
+            dynamic_parameter="n_iter",
+            static_parameters={"n_clusters": 3},
+            keep_previous=True,
+            trace_centers=True,
+        )
+
+        animator.setup_plot("Test Clustering", "Feature 1", "Feature 2")
+        n_iter_range = range(1, 10)
+
+        # Test animate method with mock
+        animation = animator.animate(
+            frames=n_iter_range, interval=150, blit=True, repeat=False
         )
         self.assertEqual(animation, animator.ani)
         mock_animation.assert_called_once()
