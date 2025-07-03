@@ -19,6 +19,7 @@ class RegressionAnimation(AnimationBase):
         max_previous=None,
         pca_components=1,
         metric_fn=None,
+        plot_metric_progression=False,
         **kwargs,
     ):
         """Initialize the regression animation class.
@@ -35,6 +36,7 @@ class RegressionAnimation(AnimationBase):
             max_previous: Maximum number of previous lines to keep.
             pca_components: Number of components to use for PCA.
             metric_fn: Optional metric function or list of functions (e.g., MSE, R2) to calculate and display during animation.
+            plot_metric_progression: Whether to plot the progression of the metric over time.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         # Input validation
@@ -88,6 +90,7 @@ class RegressionAnimation(AnimationBase):
             static_parameters,
             keep_previous,
             metric_fn=metric_fn,
+            plot_metric_progression=plot_metric_progression,
             **kwargs,
         )
 
@@ -198,12 +201,22 @@ class RegressionAnimation(AnimationBase):
                 metric_value = self.metric_fn[0](
                     self.y_test, y_pred_test_original_order
                 )
+                # Store the metric value in the progression list
+                if self.metric_progression is not None:
+                    self.metric_progression.append(metric_value)
+                    self.update_metric_plot(frame)
+
                 metric_value = round(metric_value, 4)
                 frame = round(frame, 2)
 
-                self.ax.set_title(
-                    f"Regression ({self.dynamic_parameter}={frame}) - {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}"
-                )
+                if self.plot_metric_progression:
+                    self.fig.suptitle(
+                        f"Regression ({self.dynamic_parameter}={frame}) - {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}"
+                    )
+                else:
+                    self.ax.set_title(
+                        f"Regression ({self.dynamic_parameter}={frame}) - {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}"
+                    )
                 print(
                     f"{self.dynamic_parameter}: {frame}, {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}",
                     end="\r",
@@ -214,11 +227,22 @@ class RegressionAnimation(AnimationBase):
                     metric_fn(self.y_test, y_pred_test_original_order)
                     for metric_fn in self.metric_fn
                 ]
+                # Store the metric value in the progression list
+                if self.metric_progression is not None:
+                    # Append the first metric value to the progression list
+                    self.metric_progression.append(metrics[0])
+                    self.update_metric_plot(frame)
+
                 frame = round(frame, 2)
 
-                self.ax.set_title(
-                    f"Regression ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}"
-                )
+                if self.plot_metric_progression:
+                    self.fig.suptitle(
+                        f"Regression ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}"
+                    )
+                else:
+                    self.ax.set_title(
+                        f"Regression ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}"
+                    )
                 print(
                     f"{self.dynamic_parameter}: {frame}, {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}",
                     end="\r",
@@ -227,4 +251,7 @@ class RegressionAnimation(AnimationBase):
             self.ax.set_title(f"Regression ({self.dynamic_parameter}={frame})")
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
+        # Return all artists that are updated for blitting
+        if self.plot_metric_progression and self.metric_line is not None:
+            return (self.predicted_line, self.metric_line)
         return (self.predicted_line,)

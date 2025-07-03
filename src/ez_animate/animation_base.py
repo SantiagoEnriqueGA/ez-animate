@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Animation Class
 # The goal is to create a reusable and modular animation class that can handle animations for any model and dataset.
@@ -40,6 +41,7 @@ class AnimationBase(ABC):
         static_parameters=None,
         keep_previous=None,
         metric_fn=None,
+        plot_metric_progression=None,
         **kwargs,
     ):
         """Initialize the animation base class.
@@ -53,6 +55,7 @@ class AnimationBase(ABC):
                 Should be a dictionary with parameter names as keys and their values.
             keep_previous: Whether to keep all previous lines with reduced opacity.
             metric_fn: Optional metric function or list of functions (e.g., MSE) to calculate and display during animation.
+            plot_metric_progression: Whether to plot the progression of the metric over time.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         # Input validation
@@ -77,14 +80,22 @@ class AnimationBase(ABC):
 
         # Optional metric function (e.g., MSE)
         self.metric_fn = metric_fn
+        self.plot_metric_progression = plot_metric_progression
         # If self.metric_fn is not a list, convert it to a list
         if self.metric_fn and not isinstance(self.metric_fn, list):
             self.metric_fn = [self.metric_fn]
+
+        self.metric_progression = (
+            [] if self.metric_fn and self.plot_metric_progression else None
+        )
 
         # Plot elements
         self.fig, self.ax = None, None
         self.lines = {}
         self.title = None
+        self.metric_progression = []
+        self.metric_ax = None
+        self.metric_line = None
 
     def setup_plot(
         self, title, xlabel, ylabel, legend_loc="upper left", grid=True, figsize=(12, 6)
@@ -99,10 +110,22 @@ class AnimationBase(ABC):
             grid: Whether to show grid lines.
             figsize: Size of the figure.
         """
-        self.fig, self.ax = plt.subplots(figsize=figsize)
-        self.ax.set_title(title)
-        self.ax.set_xlabel(xlabel)
-        self.ax.set_ylabel(ylabel)
+        if not self.plot_metric_progression:
+            self.fig, self.ax = plt.subplots(figsize=figsize)
+            self.ax.set_title(title)
+            self.ax.set_xlabel(xlabel)
+            self.ax.set_ylabel(ylabel)
+        else:
+            self.fig, (self.ax, self.metric_ax) = plt.subplots(
+                1, 2, figsize=figsize, gridspec_kw={"width_ratios": [3, 1]}
+            )
+            (self.metric_line,) = self.metric_ax.plot(
+                [], [], label="Metric Progression", color="green"
+            )
+            self.fig.suptitle(title)
+            self.metric_ax.set_title("Metric Progression")
+            self.metric_ax.set_xlabel("Frame")
+            self.metric_ax.set_ylabel("Metric Value")
         if legend_loc is not None:
             # self.ax.legend(loc=legend_loc)
             # Will call legend() in update_plot() to update the legend
@@ -111,6 +134,21 @@ class AnimationBase(ABC):
             self.add_legend = False
         self.ax.grid(grid)
         plt.tight_layout()
+
+    def update_metric_plot(self, frame):
+        """Update the metric plot for the current frame."""
+        # Only update if metric_line and metric_ax exist (they are set up in setup_plot)
+        if (
+            self.metric_progression is not None
+            and self.metric_line is not None
+            and self.metric_ax is not None
+        ):
+            x_data = np.arange(len(self.metric_progression))
+            y_data = np.array(self.metric_progression)
+            self.metric_line.set_data(x_data, y_data)
+            self.metric_ax.relim()
+            self.metric_ax.autoscale_view()
+
 
     @abstractmethod
     def update_model(self, frame):

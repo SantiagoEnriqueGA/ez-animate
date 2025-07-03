@@ -64,7 +64,6 @@ class ClassificationAnimation(AnimationBase):
             print("Applying scaler...")
             X = self.scaler_instance.fit_transform(X)
 
-
         if X.shape[1] > 2:
             self.needs_pca = True
             print(
