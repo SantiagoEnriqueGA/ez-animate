@@ -20,6 +20,8 @@ class ClassificationAnimation(AnimationBase):
         scaler=None,
         pca_components=2,
         plot_step=0.02,
+        metric_fn=None,
+        plot_metric_progression=None,
         **kwargs,
     ):
         """Initialize the classification animation class.
@@ -36,6 +38,8 @@ class ClassificationAnimation(AnimationBase):
             scaler: Optional scaler for preprocessing the data.
             pca_components: Number of components to use for PCA.
             plot_step: Resolution of the decision boundary mesh.
+            metric_fn: Optional metric function or list of functions (e.g., accuracy, F1) to calculate and display during animation.
+            plot_metric_progression: Whether to plot the progression of the metric over time.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         # Input validation
@@ -74,12 +78,12 @@ class ClassificationAnimation(AnimationBase):
                 pca_components = 2
             self.pca_instance = PCA(n_components=pca_components)
             X_transformed = self.pca_instance.fit_transform(X)
-        elif X.shape[1] < 2:
+        elif X.shape[1] == 2:
+            X_transformed = X  # Use original X if 2 features
+        else:
             raise ValueError(
                 "Classification animation requires at least 2 features or PCA to 2 components."
             )
-        else:
-            X_transformed = X  # Use original X if 2 features
 
         X_train, X_test, y_train, y_test = train_test_split(
             X_transformed, y, test_size=test_size, random_state=42
@@ -88,9 +92,11 @@ class ClassificationAnimation(AnimationBase):
             model,
             (X_train, y_train),
             (X_test, y_test),
-            dynamic_parameter,
-            static_parameters,
-            keep_previous,
+            dynamic_parameter=dynamic_parameter,
+            static_parameters=static_parameters,
+            keep_previous=keep_previous,
+            metric_fn=metric_fn,
+            plot_metric_progression=plot_metric_progression,
             **kwargs,
         )
 
@@ -268,6 +274,11 @@ class ClassificationAnimation(AnimationBase):
                     self.y_test, self.model_instance.predict(self.X_test)
                 )
                 metric_value = round(metric_value, 4)
+                # Store the metric value in the progression list
+                if self.metric_progression is not None:
+                    self.metric_progression.append(metric_value)
+                    self.update_metric_plot(frame)
+
                 frame = round(frame, 2)
 
                 self.ax.set_title(
@@ -283,6 +294,12 @@ class ClassificationAnimation(AnimationBase):
                     metric_fn(self.y_test, self.model_instance.predict(self.X_test))
                     for metric_fn in self.metric_fn
                 ]
+                # Store the metric value in the progression list
+                if self.metric_progression is not None:
+                    # Append the first metric value to the progression list
+                    self.metric_progression.append(metrics[0])
+                    self.update_metric_plot(frame)
+
                 frame = round(frame, 2)
 
                 self.ax.set_title(

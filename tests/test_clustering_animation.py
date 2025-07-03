@@ -566,7 +566,7 @@ class TestClusteringAnimation(BaseTest):
             test_size=0.25,
             dynamic_parameter="n_init",
             static_parameters={"n_clusters": 3},
-            metric_fn=accuracy_score
+            metric_fn=accuracy_score,
         )
         with suppress_print():
             animator.setup_plot("Test Clustering", "Feature 1", "Feature 2")
@@ -585,7 +585,7 @@ class TestClusteringAnimation(BaseTest):
             test_size=0.25,
             dynamic_parameter="n_init",
             static_parameters={"n_clusters": 3},
-            metric_fn=[silhouette_score, calinski_harabasz_score, accuracy_score]
+            metric_fn=[silhouette_score, calinski_harabasz_score, accuracy_score],
         )
         with suppress_print():
             animator.setup_plot("Test Clustering", "Feature 1", "Feature 2")
@@ -594,6 +594,7 @@ class TestClusteringAnimation(BaseTest):
         self.assertIsInstance(artists, tuple)
         self.assertGreaterEqual(len(artists), 1)
         plt.close(animator.fig)
+
 
 if __name__ == "__main__":
     unittest.main()

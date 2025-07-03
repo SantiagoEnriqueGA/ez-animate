@@ -22,6 +22,7 @@ class ClusteringAnimation(AnimationBase):
         trace_centers=False,
         scaler=None,
         pca_components=2,
+        metric_fn=None,
         **kwargs,
     ):
         """Initialize the clustering animation class.
@@ -37,6 +38,7 @@ class ClusteringAnimation(AnimationBase):
             trace_centers: Whether to trace the movement of cluster centers over iterations.
             scaler: Optional scaler for data preprocessing.
             pca_components: Number of PCA components for dimensionality reduction.
+            metric_fn: Optional metric function or list of functions (e.g., silhouette_score) to calculate and display during animation.
             **kwargs: Additional customization options.
         """
         # Input validation
@@ -106,6 +108,7 @@ class ClusteringAnimation(AnimationBase):
             dynamic_parameter=dynamic_parameter,
             static_parameters=static_parameters,
             keep_previous=keep_previous,
+            metric_fn=metric_fn,
             scaler=scaler,
             pca_components=pca_components,
             **kwargs,
@@ -265,7 +268,6 @@ class ClusteringAnimation(AnimationBase):
                     f"{self.model.__name__} must have a 'predict' method or 'labels_' attribute after fitting."
                 ) from None
 
-
         # Plot the points colored by their cluster assignment, distinguishing X_train and X_test
         n_clusters = len(np.unique(cluster_labels))
 
@@ -281,7 +283,7 @@ class ClusteringAnimation(AnimationBase):
         _n_test = self.X_test.shape[0]
         for i in range(n_clusters):
             # Mask for X_train
-            mask_train = (cluster_labels[:n_train] == i)
+            mask_train = cluster_labels[:n_train] == i
             if np.any(mask_train):
                 scatter_train = self.ax.scatter(
                     self.X_train[mask_train, 0],
@@ -294,7 +296,7 @@ class ClusteringAnimation(AnimationBase):
                 )
                 self.cluster_assignments_plot.append(scatter_train)
             # Mask for X_test
-            mask_test = (cluster_labels[n_train:] == i)
+            mask_test = cluster_labels[n_train:] == i
             if np.any(mask_test):
                 scatter_test = self.ax.scatter(
                     self.X_test[mask_test, 0],
