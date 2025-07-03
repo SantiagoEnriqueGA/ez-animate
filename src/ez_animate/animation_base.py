@@ -39,6 +39,7 @@ class AnimationBase(ABC):
         dynamic_parameter=None,
         static_parameters=None,
         keep_previous=None,
+        metric_fn=None,
         **kwargs,
     ):
         """Initialize the animation base class.
@@ -51,6 +52,7 @@ class AnimationBase(ABC):
             static_parameters: Static parameters for the model.
                 Should be a dictionary with parameter names as keys and their values.
             keep_previous: Whether to keep all previous lines with reduced opacity.
+            metric_fn: Optional metric function or list of functions (e.g., MSE) to calculate and display during animation.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         # Input validation
@@ -74,7 +76,7 @@ class AnimationBase(ABC):
         self.kwargs = kwargs
 
         # Optional metric function (e.g., MSE)
-        self.metric_fn = kwargs.get("metric_fn")
+        self.metric_fn = metric_fn
         # If self.metric_fn is not a list, convert it to a list
         if self.metric_fn and not isinstance(self.metric_fn, list):
             self.metric_fn = [self.metric_fn]

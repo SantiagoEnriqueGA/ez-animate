@@ -16,6 +16,7 @@ class ForecastingAnimation(AnimationBase):
         static_parameters=None,
         keep_previous=False,
         max_previous=None,
+        metric_fn=None,
         **kwargs,
     ):
         """Initialize the forecasting animation class.
@@ -30,6 +31,7 @@ class ForecastingAnimation(AnimationBase):
                 Should be a dictionary with parameter names as keys and their values.
             keep_previous: Whether to keep all previous lines with reduced opacity.
             max_previous: Maximum number of previous lines to keep.
+            metric_fn: Optional metric function or list of functions (e.g., MSE, MAE) to calculate and display during animation.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         super().__init__(
@@ -39,6 +41,7 @@ class ForecastingAnimation(AnimationBase):
             dynamic_parameter,
             static_parameters,
             keep_previous,
+            metric_fn=metric_fn,
             **kwargs,
         )
         self.forecast_steps = forecast_steps

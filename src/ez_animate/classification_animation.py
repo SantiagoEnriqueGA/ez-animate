@@ -20,6 +20,7 @@ class ClassificationAnimation(AnimationBase):
         scaler=None,
         pca_components=2,
         plot_step=0.02,
+        metric_fn=None,
         **kwargs,
     ):
         """Initialize the classification animation class.
@@ -36,6 +37,7 @@ class ClassificationAnimation(AnimationBase):
             scaler: Optional scaler for preprocessing the data.
             pca_components: Number of components to use for PCA.
             plot_step: Resolution of the decision boundary mesh.
+            metric_fn: Optional metric function or list of functions (e.g., accuracy, F1) to calculate and display during animation.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         # Input validation
@@ -62,6 +64,7 @@ class ClassificationAnimation(AnimationBase):
             print("Applying scaler...")
             X = self.scaler_instance.fit_transform(X)
 
+
         if X.shape[1] > 2:
             self.needs_pca = True
             print(
@@ -74,12 +77,12 @@ class ClassificationAnimation(AnimationBase):
                 pca_components = 2
             self.pca_instance = PCA(n_components=pca_components)
             X_transformed = self.pca_instance.fit_transform(X)
-        elif X.shape[1] < 2:
+        elif X.shape[1] == 2:
+            X_transformed = X  # Use original X if 2 features
+        else:
             raise ValueError(
                 "Classification animation requires at least 2 features or PCA to 2 components."
             )
-        else:
-            X_transformed = X  # Use original X if 2 features
 
         X_train, X_test, y_train, y_test = train_test_split(
             X_transformed, y, test_size=test_size, random_state=42
@@ -88,9 +91,10 @@ class ClassificationAnimation(AnimationBase):
             model,
             (X_train, y_train),
             (X_test, y_test),
-            dynamic_parameter,
-            static_parameters,
-            keep_previous,
+            dynamic_parameter=dynamic_parameter,
+            static_parameters=static_parameters,
+            keep_previous=keep_previous,
+            metric_fn=metric_fn,
             **kwargs,
         )
 

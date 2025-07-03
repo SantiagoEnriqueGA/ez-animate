@@ -18,6 +18,7 @@ class RegressionAnimation(AnimationBase):
         keep_previous=False,
         max_previous=None,
         pca_components=1,
+        metric_fn=None,
         **kwargs,
     ):
         """Initialize the regression animation class.
@@ -33,6 +34,7 @@ class RegressionAnimation(AnimationBase):
             keep_previous: Whether to keep all previous lines with reduced opacity.
             max_previous: Maximum number of previous lines to keep.
             pca_components: Number of components to use for PCA.
+            metric_fn: Optional metric function or list of functions (e.g., MSE, R2) to calculate and display during animation.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         # Input validation
@@ -85,6 +87,7 @@ class RegressionAnimation(AnimationBase):
             dynamic_parameter,
             static_parameters,
             keep_previous,
+            metric_fn=metric_fn,
             **kwargs,
         )
 

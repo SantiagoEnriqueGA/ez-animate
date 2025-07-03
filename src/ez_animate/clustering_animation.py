@@ -22,6 +22,7 @@ class ClusteringAnimation(AnimationBase):
         trace_centers=False,
         scaler=None,
         pca_components=2,
+        metric_fn=None,
         **kwargs,
     ):
         """Initialize the clustering animation class.
@@ -37,6 +38,7 @@ class ClusteringAnimation(AnimationBase):
             trace_centers: Whether to trace the movement of cluster centers over iterations.
             scaler: Optional scaler for data preprocessing.
             pca_components: Number of PCA components for dimensionality reduction.
+            metric_fn: Optional metric function or list of functions (e.g., silhouette_score) to calculate and display during animation.
             **kwargs: Additional customization options.
         """
         # Input validation
@@ -106,6 +108,7 @@ class ClusteringAnimation(AnimationBase):
             dynamic_parameter=dynamic_parameter,
             static_parameters=static_parameters,
             keep_previous=keep_previous,
+            metric_fn=metric_fn,
             scaler=scaler,
             pca_components=pca_components,
             **kwargs,
