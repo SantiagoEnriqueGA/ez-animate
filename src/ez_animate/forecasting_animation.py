@@ -17,6 +17,8 @@ class ForecastingAnimation(AnimationBase):
         keep_previous=False,
         max_previous=None,
         metric_fn=None,
+        plot_metric_progression=False,
+        max_metric_subplots=1,
         **kwargs,
     ):
         """Initialize the forecasting animation class.
@@ -32,6 +34,8 @@ class ForecastingAnimation(AnimationBase):
             keep_previous: Whether to keep all previous lines with reduced opacity.
             max_previous: Maximum number of previous lines to keep.
             metric_fn: Optional metric function or list of functions (e.g., MSE, MAE) to calculate and display during animation.
+            plot_metric_progression: Whether to plot the progression of metrics over frames.
+            max_metric_subplots: Maximum number of metric subplots to display.
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         super().__init__(
@@ -42,6 +46,8 @@ class ForecastingAnimation(AnimationBase):
             static_parameters,
             keep_previous,
             metric_fn=metric_fn,
+            plot_metric_progression=plot_metric_progression,
+            max_metric_subplots=max_metric_subplots,
             **kwargs,
         )
         self.forecast_steps = forecast_steps
@@ -180,25 +186,20 @@ class ForecastingAnimation(AnimationBase):
             # Limit the number of previous lines to avoid clutter
             if self.max_previous:
                 while len(self.previous_forecast_lines) > self.max_previous:
-                    # Remove the oldest line, pop is inplace
                     self.previous_forecast_lines.pop(0)
-
                 while len(self.previous_fitted_lines) > self.max_previous:
                     self.previous_fitted_lines.pop(0)
 
-            # For all previous forecast lines, set alpha from 0.1 to 0.5 based on the number of lines
             self.previous_forecast_lines.append(self.forecast_line)
             for i, line in enumerate(self.previous_forecast_lines):
                 line.set_alpha(0.1 + (0.4 / len(self.previous_forecast_lines)) * i)
                 line.set_color("lightcoral")
 
-            # For all previous fitted lines, set alpha from 0.1 to 0.5 based on the number of lines
             self.previous_fitted_lines.append(self.fitted_line)
             for i, line in enumerate(self.previous_fitted_lines):
                 line.set_alpha(0.1 + (0.4 / len(self.previous_fitted_lines)) * i)
                 line.set_color("lightgreen")
 
-            # Add a new fitted line
             (self.fitted_line,) = self.ax.plot(
                 [], [], label="Fitted Values", color="green"
             )
@@ -207,45 +208,46 @@ class ForecastingAnimation(AnimationBase):
         self.fitted_line.set_data(self.train_indices, self.fitted_values)
         self.forecast_line.set_data(self.forecast_indices, self.forecast_values)
 
-        # Update the title with the current frame and optional metric
+        # --- Metric Handling (match RegressionAnimation style) ---
         if self.metric_fn:
-            if len(self.metric_fn) == 1:
-                # If only one metric function is provided, use it directly
-                metric_value = self.metric_fn[0](self.test_data, self.forecast_values)
+            metrics = [
+                metric_fn(self.test_data, self.forecast_values)
+                for metric_fn in self.metric_fn
+            ]
+            frame_rounded = round(frame, 2) if isinstance(frame, float) else frame
+            metric_strs = [
+                f"{fn.__name__.capitalize()}: {metric:.4f}"
+                for fn, metric in zip(self.metric_fn, metrics)
+            ]
+            metric_str = ", ".join(metric_strs)
 
-                # Trim values
-                metric_value = round(metric_value, 4)
-                frame = round(frame, 2) if isinstance(frame, float) else frame
+            # Update metric_progression for each metric subplot (if present)
+            if self.metric_progression is not None:
+                for i in range(min(len(metrics), len(self.metric_progression))):
+                    self.metric_progression[i].append(metrics[i])
+                self.update_metric_plot(frame)
 
-                self.ax.set_title(
-                    f"Forecast ({self.dynamic_parameter}={frame}) - {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}"
-                )
-                print(
-                    f"{self.dynamic_parameter}: {frame}, {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}",
-                    end="\r",
-                )
-
+            if (
+                self.plot_metric_progression
+                and getattr(self, "metric_lines", None) is not None
+            ):
+                # self.fig.suptitle(f"Forecast ({self.dynamic_parameter}={frame_rounded}) - {metric_str}")
+                pass
             else:
-                # If multiple metric functions are provided, calculate and display each one
-                metrics = [
-                    metric_fn(self.test_data, self.forecast_values)
-                    for metric_fn in self.metric_fn
-                ]
-                frame = round(frame, 2) if isinstance(frame, float) else frame
-
                 self.ax.set_title(
-                    f"Forecast ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}"
+                    f"Forecast ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"
                 )
-                print(
-                    f"{self.dynamic_parameter}: {frame}, {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}",
-                    end="\r",
-                )
-
+            print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:
             self.ax.set_title(f"Forecast ({self.dynamic_parameter}={frame})")
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
-        # if attribute 'previous_forecast_lines' exists, return it
+        # Return all artists that are updated for blitting
+        if (
+            self.plot_metric_progression
+            and getattr(self, "metric_lines", None) is not None
+        ):
+            return [self.fitted_line, self.forecast_line, self.metric_lines]
         if hasattr(self, "previous_forecast_lines"):
             return [self.fitted_line, self.forecast_line] + self.previous_forecast_lines
         else:

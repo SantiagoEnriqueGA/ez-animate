@@ -20,6 +20,7 @@ class RegressionAnimation(AnimationBase):
         pca_components=1,
         metric_fn=None,
         plot_metric_progression=False,
+        max_metric_subplots=1,
         **kwargs,
     ):
         """Initialize the regression animation class.
@@ -37,6 +38,7 @@ class RegressionAnimation(AnimationBase):
             pca_components: Number of components to use for PCA.
             metric_fn: Optional metric function or list of functions (e.g., MSE, R2) to calculate and display during animation.
             plot_metric_progression: Whether to plot the progression of the metric over time.
+            max_metric_subplots: Maximum number of subplots to show for metric progression (if multiple metrics).
             **kwargs: Additional customization options (e.g., colors, line styles).
         """
         # Input validation
@@ -54,6 +56,11 @@ class RegressionAnimation(AnimationBase):
             raise ValueError("max_previous must be an integer or None.")
         if not isinstance(pca_components, (int, type(None))) or pca_components < 1:
             raise ValueError("pca_components must be an integer greater than 0.")
+
+        if not isinstance(max_metric_subplots, int) or max_metric_subplots < 1:
+            raise ValueError("max_metric_subplots must be an integer greater than 0.")
+
+        self.max_metric_subplots = max_metric_subplots
 
         if keep_previous:
             self.max_previous = max_previous
@@ -91,6 +98,7 @@ class RegressionAnimation(AnimationBase):
             keep_previous,
             metric_fn=metric_fn,
             plot_metric_progression=plot_metric_progression,
+            max_metric_subplots=max_metric_subplots,
             **kwargs,
         )
 
@@ -196,62 +204,42 @@ class RegressionAnimation(AnimationBase):
         if self.metric_fn:
             # Calculate metrics using the *original* test set order predictions
             y_pred_test_original_order = self.model_instance.predict(self.X_test)
-            if len(self.metric_fn) == 1:
-                # If only one metric function is provided, use it directly
-                metric_value = self.metric_fn[0](
-                    self.y_test, y_pred_test_original_order
-                )
-                # Store the metric value in the progression list
-                if self.metric_progression is not None:
-                    self.metric_progression.append(metric_value)
-                    self.update_metric_plot(frame)
+            metrics = [
+                metric_fn(self.y_test, y_pred_test_original_order)
+                for metric_fn in self.metric_fn
+            ]
+            # Update metric_progression for each metric subplot (up to max_metric_subplots)
+            if self.metric_progression is not None:
+                for i in range(min(len(metrics), len(self.metric_progression))):
+                    self.metric_progression[i].append(metrics[i])
+                self.update_metric_plot(frame)
 
-                metric_value = round(metric_value, 4)
-                frame = round(frame, 2)
+            frame_rounded = round(frame, 2)
+            # Compose metric string for title/print
+            metric_strs = [
+                f"{fn.__name__.capitalize()}: {metric:.4f}"
+                for fn, metric in zip(self.metric_fn, metrics)
+            ]
+            metric_str = ", ".join(metric_strs)
 
-                if self.plot_metric_progression:
-                    self.fig.suptitle(
-                        f"Regression ({self.dynamic_parameter}={frame}) - {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}"
-                    )
-                else:
-                    self.ax.set_title(
-                        f"Regression ({self.dynamic_parameter}={frame}) - {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}"
-                    )
-                print(
-                    f"{self.dynamic_parameter}: {frame}, {self.metric_fn[0].__name__.capitalize()}: {metric_value:.4f}",
-                    end="\r",
-                )
+            if self.plot_metric_progression:
+                # self.fig.suptitle(
+                #     f"Regression ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"
+                # )
+                pass
             else:
-                # If multiple metric functions are provided, calculate and display each one
-                metrics = [
-                    metric_fn(self.y_test, y_pred_test_original_order)
-                    for metric_fn in self.metric_fn
-                ]
-                # Store the metric value in the progression list
-                if self.metric_progression is not None:
-                    # Append the first metric value to the progression list
-                    self.metric_progression.append(metrics[0])
-                    self.update_metric_plot(frame)
-
-                frame = round(frame, 2)
-
-                if self.plot_metric_progression:
-                    self.fig.suptitle(
-                        f"Regression ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}"
-                    )
-                else:
-                    self.ax.set_title(
-                        f"Regression ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}"
-                    )
-                print(
-                    f"{self.dynamic_parameter}: {frame}, {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}",
-                    end="\r",
+                self.ax.set_title(
+                    f"Regression ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"
                 )
+            print(
+                f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}",
+                end="\r",
+            )
         else:
             self.ax.set_title(f"Regression ({self.dynamic_parameter}={frame})")
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting
-        if self.plot_metric_progression and self.metric_line is not None:
-            return (self.predicted_line, self.metric_line)
+        if self.plot_metric_progression and self.metric_lines is not None:
+            return (self.predicted_line, self.metric_lines)
         return (self.predicted_line,)
