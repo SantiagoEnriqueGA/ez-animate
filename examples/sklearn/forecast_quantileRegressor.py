@@ -39,7 +39,7 @@ animator = ForecastingAnimation(
         Metrics.mean_absolute_error,
     ],
     plot_metric_progression=True,
-    max_metric_subplots=2,
+    max_metric_subplots=1,
 )
 
 # Set up the plot
@@ -54,7 +54,7 @@ animator.setup_plot(
 
 # Create and save the animation
 quantile_range = np.arange(0.01, 1.0, 0.01)
-animator.animate(frames=quantile_range, interval=150, blit=False, repeat=True)
+animator.animate(frames=quantile_range, interval=150, blit=False, repeat=False)
 # animator.save(
 #     filename="examples/plots/sklearn_forecast_quantileRegressor.gif",
 #     writer="pillow",

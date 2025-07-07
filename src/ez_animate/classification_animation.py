@@ -281,8 +281,7 @@ class ClassificationAnimation(AnimationBase):
                 self.plot_metric_progression
                 and getattr(self, "metric_lines", None) is not None
             ):
-                # self.fig.suptitle(f"Classification ({self.dynamic_parameter}={frame_rounded}) - {metric_str}")
-                pass
+                self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
             else:
                 self.ax.set_title(
                     f"Classification ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"

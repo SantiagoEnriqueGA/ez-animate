@@ -49,7 +49,7 @@ animator.setup_plot(
 
 # Animate over a range of iterations
 max_iters = 15
-animator.animate(frames=range(1, max_iters + 1), interval=500, blit=False, repeat=True)
+animator.animate(frames=range(1, max_iters + 1), interval=500, blit=False, repeat=False)
 
 # To save the animation, uncomment the following lines:
 # animator.save(

@@ -31,12 +31,12 @@ animator = RegressionAnimation(
     keep_previous=True,
     max_previous=25,
     metric_fn=[
-        Metrics.mean_absolute_error,
         Metrics.r_squared,
         Metrics.mean_squared_error,
+        Metrics.mean_absolute_error,
     ],
     plot_metric_progression=True,
-    max_metric_subplots=3,
+    max_metric_subplots=2,
 )
 
 # Set up the plot

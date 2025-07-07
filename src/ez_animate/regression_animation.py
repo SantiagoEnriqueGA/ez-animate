@@ -142,9 +142,9 @@ class RegressionAnimation(AnimationBase):
             self.X_test[:, 0],
             self.y_test,
             label="Test Data",
-            color="blue",
+            color="lightcoral",
             marker="x",
-            zorder=3,
+            zorder=2,
         )
 
         # Create a placeholder for the predicted regression line
@@ -223,10 +223,7 @@ class RegressionAnimation(AnimationBase):
             metric_str = ", ".join(metric_strs)
 
             if self.plot_metric_progression:
-                # self.fig.suptitle(
-                #     f"Regression ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"
-                # )
-                pass
+                self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
             else:
                 self.ax.set_title(
                     f"Regression ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"

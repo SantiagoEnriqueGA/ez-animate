@@ -157,6 +157,7 @@ class AnimationBase(ABC):
                 metric_ax.tick_params(axis="both", which="major", labelsize=8)
                 self.metric_axes.append(metric_ax)
                 self.metric_lines.append(metric_line)
+                self.ax.set_title(f"{self.dynamic_parameter}=")
             self.fig.suptitle(title)
         if legend_loc is not None:
             # self.ax.legend(loc=legend_loc)
@@ -164,7 +165,6 @@ class AnimationBase(ABC):
             self.add_legend = True
         else:
             self.add_legend = False
-        self.ax.set_title(title)
         self.ax.set_xlabel(xlabel)
         self.ax.set_ylabel(ylabel)
         self.ax.grid(grid)
