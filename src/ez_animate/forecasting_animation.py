@@ -238,7 +238,8 @@ class ForecastingAnimation(AnimationBase):
                 )
             print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:
-            self.ax.set_title(f"Forecast ({self.dynamic_parameter}={frame})")
+            frame_rounded = round(frame, 2) if isinstance(frame, float) else frame
+            self.ax.set_title(f"Forecast ({self.dynamic_parameter}={frame_rounded})")
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting
