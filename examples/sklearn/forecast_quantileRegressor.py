@@ -31,12 +31,15 @@ animator = ForecastingAnimation(
     test_series=test_series,
     forecast_steps=forecast_steps,
     keep_previous=True,
+    max_previous=10,
     dynamic_parameter="quantile",
     static_parameters={"alpha": 1, "fit_intercept": True},
     metric_fn=[
         Metrics.mean_squared_error,
         Metrics.mean_absolute_error,
     ],
+    plot_metric_progression=True,
+    max_metric_subplots=2,
 )
 
 # Set up the plot
@@ -51,9 +54,9 @@ animator.setup_plot(
 
 # Create and save the animation
 quantile_range = np.arange(0.01, 1.0, 0.01)
-animator.animate(frames=quantile_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=quantile_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/utils/plots/animator_wma_forecast_animation.gif",
+#     filename="examples/plots/sklearn_forecast_quantileRegressor.gif",
 #     writer="pillow",
 #     fps=5,
 #     dpi=300,

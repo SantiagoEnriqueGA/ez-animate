@@ -1,8 +1,13 @@
+import warnings
+
 import numpy as np
 
 from ez_animate import RegressionAnimation
 from sega_learn.utils import Metrics, make_regression
 from sklearn.linear_model import SGDRegressor
+
+# Suppress warnings from sklearn about convergence
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # Generate synthetic regression data
 X, y = make_regression(
@@ -31,6 +36,7 @@ animator = RegressionAnimation(
         Metrics.mean_squared_error,
     ],
     plot_metric_progression=True,
+    max_metric_subplots=3,
 )
 
 # Set up the plot
@@ -40,14 +46,14 @@ animator.setup_plot(
     ylabel="Target Value",
     legend_loc="upper left",
     grid=True,
-    figsize=(12, 6),
+    figsize=(14, 6),
 )
 
 # Create and save the animation
 iter_range = np.arange(1, 100, 1)
 animator.animate(frames=iter_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="animator_sgd.gif",
+#     filename="examples/plots/sklearn_regression_sgd.gif",
 #     writer="pillow",
 #     fps=10,
 #     dpi=300,

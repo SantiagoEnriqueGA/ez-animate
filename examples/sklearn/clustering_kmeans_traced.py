@@ -33,6 +33,8 @@ animator = ClusteringAnimation(
     keep_previous=True,
     trace_centers=True,
     metric_fn=[silhouette_score, calinski_harabasz_score],
+    plot_metric_progression=True,
+    max_metric_subplots=2,
 )
 
 # Set up the plot
@@ -47,11 +49,11 @@ animator.setup_plot(
 
 # Animate over a range of iterations
 max_iters = 15
-animator.animate(frames=range(1, max_iters + 1), interval=500, blit=False, repeat=False)
+animator.animate(frames=range(1, max_iters + 1), interval=500, blit=False, repeat=True)
 
 # To save the animation, uncomment the following lines:
 # animator.save(
-#     filename="examples/plots/animator_kmeans.gif",
+#     filename="examples/plots/sklearn_clustering_kmeans_traced.gif",
 #     writer="pillow",
 #     fps=2,
 #     dpi=150,

@@ -45,9 +45,9 @@ animator.setup_plot(
 
 # Create and save the animation
 n_estimators_range = range(1, 101, 5)  # Range for n_estimators parameter
-animator.animate(frames=n_estimators_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=n_estimators_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/plots/animator_gradient_boosting.gif",
+#     filename="examples/plots/sklearn_classification_gradientBoostingClassifier.gif",
 #     writer="pillow",
 #     fps=3,
 #     dpi=300,

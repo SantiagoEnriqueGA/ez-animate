@@ -1,9 +1,14 @@
+import warnings
+
 import numpy as np
 
 from ez_animate import ClassificationAnimation
 from sega_learn.utils import Metrics, Scaler, make_classification
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import f1_score
+
+# Suppress warnings from sklearn about convergence
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 
 def macro_f1_score(y_true, y_pred):
@@ -46,6 +51,7 @@ animator = ClassificationAnimation(
         Metrics.recall,
     ],
     plot_metric_progression=True,
+    max_metric_subplots=2,
 )
 
 # Set up the plot
@@ -60,9 +66,9 @@ animator.setup_plot(
 
 # Create and save the animation
 iter_range = np.arange(1, 101, 1)
-animator.animate(frames=iter_range, interval=150, blit=False, repeat=False)
+animator.animate(frames=iter_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/plots/animator_gradient_boosting.gif",
+#     filename="examples/plots/sklearn_classification_sgd.gif",
 #     writer="pillow",
 #     fps=3,
 #     dpi=300,
