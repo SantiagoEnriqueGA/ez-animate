@@ -48,9 +48,9 @@ animator.setup_plot(
 
 # Create and save the animation
 window_range = range(1, 51)  # Windows from 1 to 50
-animator.animate(frames=window_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=window_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/utils/plots/animator_wma_forecast_animation.gif",
+#     filename="examples/plots/sega_learn_forecast_weightedMovingAverage.gif",
 #     writer="pillow",
 #     fps=5,
 #     dpi=300,

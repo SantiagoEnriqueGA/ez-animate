@@ -50,9 +50,9 @@ animator.setup_plot(
 
 # Create and save the animation
 alpha_range = np.arange(0.01, 0.5, 0.01)
-animator.animate(frames=alpha_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=alpha_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/utils/plots/animator_ema_forecast_animation.gif",
+#     filename="examples/plots/sega_learn_forecast_exponentialMovingAverage.gif",
 #     writer="pillow",
 #     fps=5,
 #     dpi=300,
