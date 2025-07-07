@@ -16,6 +16,7 @@ from ez_animate import (
     ForecastingAnimation,
     RegressionAnimation,
 )
+from ez_animate.animation_base import AnimationBase
 from sega_learn.clustering import KMeans
 from sega_learn.linear_models import LogisticRegression, Ridge
 from sega_learn.time_series.moving_average import ExponentialMovingAverage
@@ -29,6 +30,76 @@ from sega_learn.utils import (
 
 class TestAnimationBase(BaseTest):
     """Base class for animation tests."""
+
+    def test_update_metric_plot_basic(self):
+        """Test update_metric_plot updates metric lines and annotations correctly."""
+
+        class DummyAnimation(AnimationBase):
+            def update_model(self, frame):
+                pass
+
+            def update_plot(self, frame):
+                pass
+
+        # Dummy metric function
+        def dummy_metric(y_true, y_pred):
+            return np.sum(y_true) + np.sum(y_pred)
+
+        dummy = DummyAnimation(
+            model=None,
+            train_series=[1, 2, 3],
+            test_series=[4, 5, 6],
+            dynamic_parameter="param",
+            static_parameters={},
+            keep_previous=False,
+            metric_fn=[dummy_metric],
+            plot_metric_progression=True,
+            max_metric_subplots=1,
+        )
+        dummy.setup_plot("Title", "X", "Y")
+        # Simulate metric progression
+        dummy.metric_progression[0].extend([1.0, 2.0, 3.0])
+        dummy.update_metric_plot(frame=2)
+        # Check that metric line data matches progression
+        x_data, y_data = dummy.metric_lines[0].get_data()
+        self.assertTrue(np.array_equal(x_data, np.arange(3)))
+        self.assertTrue(np.array_equal(y_data, np.array([1.0, 2.0, 3.0])))
+        # Check annotation exists and value is correct
+        annotation = getattr(dummy.metric_axes[0], "_current_metric_annotation", None)
+        self.assertIsNotNone(annotation)
+        self.assertIn("3", annotation.get_text())
+        plt.close(dummy.fig)
+
+    def test_update_metric_plot_empty(self):
+        """Test update_metric_plot with empty progression does not fail and annotation is None."""
+
+        class DummyAnimation(AnimationBase):
+            def update_model(self, frame):
+                pass
+
+            def update_plot(self, frame):
+                pass
+
+        def dummy_metric(y_true, y_pred):
+            return 0
+
+        dummy = DummyAnimation(
+            model=None,
+            train_series=[1, 2, 3],
+            test_series=[4, 5, 6],
+            dynamic_parameter="param",
+            static_parameters={},
+            keep_previous=False,
+            metric_fn=[dummy_metric],
+            plot_metric_progression=True,
+            max_metric_subplots=1,
+        )
+        dummy.setup_plot("Title", "X", "Y")
+        # metric_progression is empty
+        dummy.update_metric_plot(frame=0)
+        annotation = getattr(dummy.metric_axes[0], "_current_metric_annotation", None)
+        self.assertIsNone(annotation)
+        plt.close(dummy.fig)
 
     @classmethod
     def setUpClass(cls):  # NOQA D201

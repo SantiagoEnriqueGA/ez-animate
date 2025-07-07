@@ -23,6 +23,94 @@ from sega_learn.utils import (
 class TestRegressionAnimation(BaseTest):
     """Unit test for the RegressionAnimation class."""
 
+    def test_keep_previous_max_previous_behavior(self):
+        """Test keep_previous and max_previous logic in update_plot."""
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            keep_previous=True,
+            max_previous=2,
+        )
+        animator.setup_plot("Test Regression", "Feature", "Target")
+        animator.update_model(100)
+        # Simulate multiple frames to trigger previous_predicted_lines logic
+        for frame in [100, 200, 300, 400]:
+            animator.update_model(frame)
+            animator.update_plot(frame)
+        self.assertLessEqual(len(animator.previous_predicted_lines), 3)
+        plt.close(animator.fig)
+
+    def test_metric_progression_and_lines(self):
+        """Test metric progression and metric_lines logic in update_plot."""
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters={"alpha": 1.0},
+            metric_fn=[Metrics.mean_squared_error, Metrics.r_squared],
+            plot_metric_progression=True,
+            max_metric_subplots=2,
+        )
+        animator.setup_plot("Test Regression", "Feature", "Target")
+        animator.metric_progression = [[], []]
+        # Simulate metric_lines for blitting
+        from matplotlib.lines import Line2D
+
+        animator.metric_lines = [Line2D([], []), Line2D([], [])]
+        animator.update_model(100)
+        result = animator.update_plot(100)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        plt.close(animator.fig)
+
+    def test_static_parameters_none_defaults_to_dict(self):
+        """Test that static_parameters=None results in an empty dict."""
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            static_parameters=None,
+        )
+        self.assertIsInstance(animator.static_parameters, dict)
+
+    def test_pca_1d_input_no_pca(self):
+        """Test that 1D input does not trigger PCA."""
+        X_1d = np.random.rand(100, 1)
+        y_1d = np.random.rand(100)
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=X_1d,
+            y=y_1d,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            pca_components=1,
+        )
+        self.assertFalse(animator.needs_pca)
+        self.assertIsNone(animator.pca_instance)
+
+    def test_update_plot_no_metric_fn(self):
+        """Test update_plot when metric_fn is None."""
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+        )
+        animator.setup_plot("Test Regression", "Feature", "Target")
+        animator.update_model(100)
+        # Should not raise or print metric info
+        result = animator.update_plot(100)
+        self.assertIsInstance(result, tuple)
+        plt.close(animator.fig)
+
     @classmethod
     def setUpClass(cls):  # NOQA D201
         """Initializes the test suite."""
@@ -70,6 +158,27 @@ class TestRegressionAnimation(BaseTest):
                 y=None,
                 test_size=0.25,
                 dynamic_parameter="max_iter",
+            )
+
+    def test_init_with_invalid_max_subplots(self):
+        """Test initialization with invalid max_subplots."""
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+                max_metric_subplots=-1,
+            )
+        with self.assertRaises(ValueError):
+            RegressionAnimation(
+                model=Ridge,
+                X=self.X,
+                y=self.y,
+                test_size=0.25,
+                dynamic_parameter="max_iter",
+                max_metric_subplots=0,
             )
 
     def test_init_with_invalid_test_size(self):
