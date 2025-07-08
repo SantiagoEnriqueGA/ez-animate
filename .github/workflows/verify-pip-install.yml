@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', "3.11", '3.12'] # Test on these Python versions
+        python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
@@ -36,15 +36,15 @@ jobs:
 
     - name: Install required packages
       run: |
-        source venv/bin/activate
+        source .venv/bin/activate
         pip install matplotlib numpy scipy
 
     - name: Install ez-animate package from pypi
       run: |
-        source venv/bin/activate
+        source .venv/bin/activate
         pip install ez-animate
 
     - name: Verify ez-animate installation
       run: |
-        source venv/bin/activate
-        python -c "import ez-animate; print('ez-animate installed successfully')"
+        source .venv/bin/activate
+        python -c "import ez_animate; print('ez-animate installed successfully')"
