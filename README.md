@@ -32,15 +32,6 @@
 A high-level, declarative Python package for creating common Matplotlib animations with minimal boilerplate code.
 
 
-## Table of Contents
-- [Project Goals](#project-goals)
-- [Features](#features)
-- [Installation](#installation)
-- [Quickstart](#quickstart)
-- [Full Documentation](#full-documentation)
-- [Development/Contributing](#developmentcontributing)
-
-
 ## Project Goals
 
 `ez-animate` aims to make it easy for data scientists, analysts, educators, and researchers to create standard Matplotlib animations quickly and with minimal code. It abstracts away the complexity of `FuncAnimation`, state management, and repetitive setup, letting you focus on your data and story.
