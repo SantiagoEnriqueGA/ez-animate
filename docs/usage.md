@@ -7,50 +7,53 @@ More advanced usage examples can be found in the on [GitHub](https://github.com/
 
 ## Complete Scikit-learn Example
 
-This section demonstrates how to use `ez-animate` with a Scikit-learn lasso regression model to create an animation of the model's predictions for alpha values ranging from 0.01 to 1.0.
+This section demonstrates how to use `ez-animate` with a Scikit-learn SGD regression model to create an animation of the model's predictions for max_iter values ranging from 1 to 100.
 
 ```python
 import numpy as np
 
 from ez_animate import RegressionAnimation
 from sega_learn.utils import Metrics, make_regression
-from sklearn.linear_model import Lasso
+from sklearn.linear_model import SGDRegressor
 
 # Generate synthetic regression data
 X, y = make_regression(n_samples=1000, n_features=1)
 
 # Create the animation using RegressionAnimation
 animator = RegressionAnimation(
-    model=Lasso,
+    model=SGDRegressor,
     X=X,
     y=y,
     test_size=0.25,
-    dynamic_parameter="alpha",
-    static_parameters={"max_iter": 1, "fit_intercept": True},
+    dynamic_parameter="max_iter",
+    static_parameters={"fit_intercept": True, "eta0": 0.0005},
     keep_previous=True,
+    max_previous=25,
     metric_fn=[
-        Metrics.mean_squared_error,
-        Metrics.mean_absolute_error,
         Metrics.r_squared,
+        Metrics.mean_squared_error,
     ],
+    plot_metric_progression=True,
+    max_metric_subplots=2,
 )
 
 # Set up the plot
 animator.setup_plot(
-    title="Lasso Regression Animation",
+    title="SGD Regression Animation",
     xlabel="Feature Coefficient",
     ylabel="Target Value",
     legend_loc="upper left",
     grid=True,
-    figsize=(12, 6),
+    figsize=(14, 6),
 )
 
-# Create and show the animation
-alpha_range = np.arange(0.01, 1.0, 0.01)
-animator.animate(frames=alpha_range, interval=150, blit=True, repeat=False)
+# Create and save the animation
+iter_range = np.arange(1, 100, 1)
+animator.animate(frames=iter_range, interval=150, blit=False, repeat=True)
 animator.show()
+
 ```
-![Lasso Regression Animation](plots/animator_lasso.gif)
+![SGD Regression Animation](plots/animator_sgd.gif)
 
 
 ## Complete sega_learn Example

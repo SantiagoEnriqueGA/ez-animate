@@ -15,15 +15,19 @@ Creates Matplotlib animations for regression models.
 **Constructor:**
 ```python
 RegressionAnimation(
-    model, 
-    X, 
-    y, 
-    test_size=0.3, 
+    model,
+    X,
+    y,
+    test_size=0.3,
     dynamic_parameter=None,
     static_parameters=None,
     keep_previous=False,
     max_previous=None,
     pca_components=1,
+    metric_fn=None,
+    plot_metric_progression=False,
+    max_metric_subplots=1,
+    **kwargs,
     **kwargs
 )
 ```
@@ -38,6 +42,9 @@ RegressionAnimation(
 - `keep_previous`: Whether to keep and display previous model states (default: False).
 - `max_previous`: Maximum number of previous states to keep (default: None).
 - `pca_components`: Number of PCA components to reduce dimensionality (default: 1).
+- `metric_fn`: Optional metric function or list of functions (e.g., MSE, R2) to calculate and display during animation.
+- `plot_metric_progression`: Whether to plot the progression of the metric over time.
+- `max_metric_subplots`: Maximum number of subplots to show for metric progression (if multiple metrics).
 - `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
 
 
@@ -52,16 +59,19 @@ Creates Matplotlib animations for classification models.
 **Constructor:**
 ```python
 ClassificationAnimation(
-    model, 
-    X, 
-    y, 
-    test_size=0.3, 
+    model,
+    X,
+    y,
+    test_size=0.3,
     dynamic_parameter=None,
     static_parameters=None,
     keep_previous=False,
     scaler=None,
     pca_components=2,
     plot_step=0.02,
+    metric_fn=None,
+    plot_metric_progression=None,
+    max_metric_subplots=1,
     **kwargs
 )
 ```
@@ -77,6 +87,9 @@ ClassificationAnimation(
 - `scaler`: Scaler instance for preprocessing (e.g., `StandardScaler`).
 - `pca_components`: Number of PCA components to reduce dimensionality (default: 2).
 - `plot_step`: Step size for mesh grid in decision boundary plots (default: 0.02).
+- `metric_fn`: Optional metric function or list of functions (e.g., accuracy, F1) to calculate and display during animation.
+- `plot_metric_progression`: Whether to plot the progression of the metric over time.
+- `max_metric_subplots`: Maximum number of subplots to show for metric progression (if multiple metrics).
 - `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
 
 
@@ -103,6 +116,9 @@ ClusteringAnimation(
     trace_centers=False,
     scaler=None,
     pca_components=2,
+    metric_fn=None,
+    plot_metric_progression=None,
+    max_metric_subplots=1,
     **kwargs
 )
 ```
@@ -118,6 +134,9 @@ ClusteringAnimation(
 - `trace_centers`: Whether to trace the movement of cluster centers over iterations (default: False).
 - `scaler`: Scaler instance for preprocessing (e.g., `StandardScaler`).
 - `pca_components`: Number of PCA components to reduce dimensionality (default: 2).
+- `metric_fn`: Optional metric function or list of functions (e.g., silhouette_score) to calculate and display during animation.
+- `plot_metric_progression`: Whether to plot the progression of metrics over frames.
+- `max_metric_subplots`: Maximum number of metric subplots to display.
 - `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
 
 
@@ -133,14 +152,17 @@ Creates Matplotlib animations for time series forecasting models.
 **Constructor:**
 ```python
 ForecastingAnimation(
-    model, 
-    train_series, 
-    test_series, 
-    forecast_steps, 
-    dynamic_parameter=None, 
-    static_parameters=None, 
-    keep_previous=False, 
-    max_previous=None, 
+    model,
+    train_series,
+    test_series,
+    forecast_steps,
+    dynamic_parameter=None,
+    static_parameters=None,
+    keep_previous=False,
+    max_previous=None,
+    metric_fn=None,
+    plot_metric_progression=None,
+    max_metric_subplots=1,
     **kwargs
 )
 ```
@@ -154,6 +176,9 @@ ForecastingAnimation(
 - `static_parameters`: Dictionary of static parameters (e.g., `{'trend': 'add'}`).
 - `keep_previous`: Whether to keep and display previous forecasts (default: False).
 - `max_previous`: Maximum number of previous forecasts to keep (default: None).
+- `metric_fn`: Optional metric function or list of functions (e.g., MSE, MAE) to calculate and display during animation.
+- `plot_metric_progression`: Whether to plot the progression of metrics over frames.
+- `max_metric_subplots`: Maximum number of metric subplots to display.
 - `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
 
 
@@ -201,4 +226,3 @@ Save the animation to a file (e.g., GIF or MP4).
 show()
 ```
 Display the animation in a window or notebook.
-
