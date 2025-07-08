@@ -47,9 +47,9 @@ jobs:
     name: Build and publish Python distributions to PyPI
     runs-on: ubuntu-latest
     needs: test_package # IMPORTANT: This job depends on the 'test_package' job
-    # Prevent publishing from branches other than main, even if manually triggered
-    # Ensure the version in pyproject.toml is updated on main before running.
-    if: github.ref == 'refs/heads/main' && needs.test_package.result == 'success'
+    # Prevent publishing from branches other than master, even if manually triggered
+    # Ensure the version in pyproject.toml is updated on master before running.
+    if: github.ref == 'refs/heads/master' && needs.test_package.result == 'success'
     permissions:
       contents: write  # Allow writing repository contents (needed for creating tags/releases)
 
@@ -79,7 +79,7 @@ jobs:
           echo "Version from manual input: $INPUT_VERSION"
           if [ "$PYPROJECT_VERSION" != "$INPUT_VERSION" ]; then
             echo "Error: Version in pyproject.toml ($PYPROJECT_VERSION) does not match manually input version ($INPUT_VERSION)."
-            echo "Please update pyproject.toml on the 'main' branch and re-run with the correct version."
+            echo "Please update pyproject.toml on the 'master' branch and re-run with the correct version."
             exit 1
           fi
           echo "Versions match. Proceeding with build."
