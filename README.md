@@ -6,8 +6,7 @@
   <a href="https://github.com/SantiagoEnriqueGA/ez-animate/actions">
     <img src="https://github.com/SantiagoEnriqueGA/ez-animate/workflows/CI/badge.svg" alt="Build Status">
   </a>
-  <!-- Uncomment after PyPI release -->
-  <!-- <a href="https://pypi.org/project/ez-animate/">
+  <a href="https://pypi.org/project/ez-animate/">
     <img src="https://img.shields.io/pypi/v/ez-animate.svg" alt="PyPI Version">
   <a href="https://pepy.tech/project/ez-animate">
     <img src="https://static.pepy.tech/badge/ez-animate" alt="Downloads">
@@ -15,7 +14,7 @@
   </a>
   <a href="https://pypi.org/project/ez-animate/">
     <img src="https://img.shields.io/pypi/pyversions/ez-animate.svg" alt="Python Versions">
-  </a> -->
+  </a>
   <a href="https://codecov.io/gh/SantiagoEnriqueGA/ez-animate">
     <img src="https://codecov.io/gh/SantiagoEnriqueGA/ez-animate/branch/master/graph/badge.svg" alt="Code Coverage">
   </a>
