@@ -234,7 +234,8 @@ class ForecastingAnimation(AnimationBase):
                 self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
             else:
                 self.ax.set_title(
-                    f"Forecast ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"
+                    f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
+                    fontsize=10,
                 )
             print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:

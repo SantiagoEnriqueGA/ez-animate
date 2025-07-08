@@ -119,6 +119,7 @@ class AnimationBase(ABC):
         if not self.plot_metric_progression:
             self.fig, self.ax = plt.subplots(figsize=figsize)
             self.ax.set_title(title)
+            self.fig.suptitle(title)
             self.ax.set_xlabel(xlabel)
             self.ax.set_ylabel(ylabel)
             self.metric_axes = None

@@ -194,7 +194,11 @@ class RegressionAnimation(AnimationBase):
 
             # Add a new predicted line
             (self.predicted_line,) = self.ax.plot(
-                [], [], label="Regression Line", color="red"
+                [],
+                [],
+                label="Regression Line",
+                color="red",
+                zorder=len(self.previous_predicted_lines) + 1,
             )
 
         # Update the regression line with the predicted values
@@ -226,7 +230,8 @@ class RegressionAnimation(AnimationBase):
                 self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
             else:
                 self.ax.set_title(
-                    f"Regression ({self.dynamic_parameter}={frame_rounded}) - {metric_str}"
+                    f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
+                    fontsize=10,
                 )
             print(
                 f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}",
