@@ -24,6 +24,122 @@ from sklearn.metrics import accuracy_score, calinski_harabasz_score, silhouette_
 class TestClusteringAnimation(BaseTest):
     """Unit test for the ClusteringAnimation class."""
 
+    def test_update_plot_removal_exceptions(self):
+        """Test update_plot covers the except Exception: pass for cluster_centers_plot and cluster_assignments_plot removal."""
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+        )
+        animator.setup_plot("Test", "F1", "F2")
+
+        # Patch cluster_centers_plot and cluster_assignments_plot to raise exception on remove
+        class Dummy:
+            def remove(self):
+                raise Exception("remove error")
+
+        animator.cluster_centers_plot = [Dummy()]
+        animator.cluster_assignments_plot = [Dummy()]
+        # Should not raise
+        animator.update_plot(3)
+        plt.close(animator.fig)
+
+    def test_update_plot_colormap_fallback(self):
+        """Test update_plot covers the except AttributeError for colormap fallback."""
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+        )
+        animator.setup_plot("Test", "F1", "F2")
+        # Patch plt.colormaps.get_cmap to raise AttributeError
+        orig_colormaps = getattr(plt, "colormaps", None)
+
+        class DummyColormaps:
+            def get_cmap(self, name):
+                raise AttributeError()
+
+        plt.colormaps = DummyColormaps()
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            animator.update_plot(3)
+        if orig_colormaps is not None:
+            plt.colormaps = orig_colormaps
+        plt.close(animator.fig)
+
+    def test_update_plot_pca_transform_centers(self):
+        """Test update_plot covers the PCA transform of centers (centers.shape[1] != 2)."""
+        from sklearn.decomposition import PCA as SkPCA
+
+        X = np.random.rand(100, 5)
+        y = np.random.randint(0, 3, size=100)
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=X,
+            labels=y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+        )
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(3)
+
+        # Patch model_instance to have cluster_centers_ with shape != 2
+        class DummyModel:
+            def __init__(self):
+                self.cluster_centers_ = np.random.rand(3, 5)
+
+            def predict(self, X):
+                return np.zeros(X.shape[0], dtype=int)
+
+        animator.model_instance = DummyModel()
+        # Patch pca_instance to a real PCA
+        animator.pca_instance = SkPCA(n_components=2).fit(X)
+        animator.update_plot(3)
+        plt.close(animator.fig)
+
+    def test_update_plot_no_metric_fn(self):
+        """Test update_plot covers the else branch when metric_fn is None."""
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+        )
+        animator.setup_plot("No Metric", "F1", "F2")
+        animator.update_model(3)
+        artists = animator.update_plot(3)
+        self.assertIsInstance(artists, tuple)
+        plt.close(animator.fig)
+
+    def test_update_plot_final_return(self):
+        """Test update_plot covers the final return (no metric progression, no metric_lines)."""
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+        )
+        animator.setup_plot("Final Return", "F1", "F2")
+        animator.update_model(4)
+        # Ensure plot_metric_progression is False and metric_lines is None
+        animator.plot_metric_progression = False
+        if hasattr(animator, "metric_lines"):
+            delattr(animator, "metric_lines")
+        artists = animator.update_plot(4)
+        self.assertIsInstance(artists, tuple)
+        plt.close(animator.fig)
+
     @classmethod
     def setUpClass(cls):
         """Set up the test class (set matplotlib backend and suppress legend warnings)."""
@@ -566,7 +682,7 @@ class TestClusteringAnimation(BaseTest):
             test_size=0.25,
             dynamic_parameter="n_init",
             static_parameters={"n_clusters": 3},
-            metric_fn=accuracy_score
+            metric_fn=accuracy_score,
         )
         with suppress_print():
             animator.setup_plot("Test Clustering", "Feature 1", "Feature 2")
@@ -585,7 +701,7 @@ class TestClusteringAnimation(BaseTest):
             test_size=0.25,
             dynamic_parameter="n_init",
             static_parameters={"n_clusters": 3},
-            metric_fn=[silhouette_score, calinski_harabasz_score, accuracy_score]
+            metric_fn=[silhouette_score, calinski_harabasz_score, accuracy_score],
         )
         with suppress_print():
             animator.setup_plot("Test Clustering", "Feature 1", "Feature 2")
@@ -594,6 +710,7 @@ class TestClusteringAnimation(BaseTest):
         self.assertIsInstance(artists, tuple)
         self.assertGreaterEqual(len(artists), 1)
         plt.close(animator.fig)
+
 
 if __name__ == "__main__":
     unittest.main()

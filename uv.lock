@@ -561,16 +561,19 @@ dev = [
     { name = "mkdocs" },
     { name = "mkdocs-material" },
     { name = "pre-commit" },
+    { name = "pygments" },
+    { name = "pymdown-extensions" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
     { name = "sega-learn" },
-    { name = "sktime" },
     { name = "twine" },
 ]
 docs = [
     { name = "mkdocs" },
     { name = "mkdocs-material" },
+    { name = "pygments" },
+    { name = "pymdown-extensions" },
 ]
 lint = [
     { name = "ruff" },
@@ -579,7 +582,6 @@ test = [
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "sega-learn" },
-    { name = "sktime" },
 ]
 
 [package.metadata]
@@ -591,12 +593,13 @@ requires-dist = [
     { name = "mkdocs-material", marker = "extra == 'docs'", specifier = ">=9.5" },
     { name = "numpy", specifier = ">=2" },
     { name = "pre-commit", marker = "extra == 'dev'" },
+    { name = "pygments", marker = "extra == 'docs'" },
+    { name = "pymdown-extensions", marker = "extra == 'docs'" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8.0" },
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "ruff", marker = "extra == 'lint'" },
     { name = "scipy", specifier = ">=1.10" },
     { name = "sega-learn", marker = "extra == 'test'" },
-    { name = "sktime", marker = "extra == 'test'" },
     { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0" },
 ]
 provides-extras = ["test", "docs", "lint", "dev"]
@@ -1970,15 +1973,6 @@ wheels = [
 ]
 
 [[package]]
-name = "scikit-base"
-version = "0.12.3"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/91/56/08241a3da51aa65db33e8cbdaff8bf686400b4038e5ec15f9cac9fe66a4c/scikit_base-0.12.3.tar.gz", hash = "sha256:082e9933924679e892d6c02314c4b0d8cff3ccce1755957756421da5590ee833", size = 122244 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f4/05/935427ff03dbfb5e3a5ad10b063c90e510708ff273de934cbbc1e5ad4e9c/scikit_base-0.12.3-py3-none-any.whl", hash = "sha256:72324750412906bd3e08a729f60ce1925735e7bb2d54653ad9706038b6d26621", size = 145486 },
-]
-
-[[package]]
 name = "scikit-learn"
 version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2160,26 +2154,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050 },
-]
-
-[[package]]
-name = "sktime"
-version = "0.37.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "joblib" },
-    { name = "numpy", version = "2.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "packaging" },
-    { name = "pandas" },
-    { name = "scikit-base" },
-    { name = "scikit-learn" },
-    { name = "scipy", version = "1.13.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/b7/47/0c6703ae44c5d4ef1c6ea9fa169c3017e53998415b21c4bf0be827b3d59b/sktime-0.37.0.tar.gz", hash = "sha256:67aa1f3771ac99071ba83215370bc61c725e787f2826150121dcf541d203341e", size = 36031585 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/89/37add351bfa660aafaa04e693b99b9a3023e9cd18f3616160b2cf822cabb/sktime-0.37.0-py3-none-any.whl", hash = "sha256:c06b219e63cf1925166ab3bf765f48de67d6eec97a4ee5ba32412f13297dbd9c", size = 37007087 },
 ]
 
 [[package]]

@@ -22,6 +22,181 @@ from sega_learn.utils import (
 class TestClassificationAnimation(BaseTest):
     """Unit test for the ClassificationAnimation class."""
 
+    def test_update_plot_decision_boundary_remove_exception(self):
+        """Test update_plot handles exception when removing decision_boundary."""
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+        )
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(100)
+
+        # Simulate a decision_boundary with no remove method but with collections
+        class DummyBoundary:
+            collections = [type("C", (), {"remove": lambda self: None})()]
+
+        animator.decision_boundary = DummyBoundary()
+        animator.decision_boundary_lines = None
+        with suppress_print():
+            # Should not raise
+            animator.update_plot(100)
+
+    def test_update_plot_decision_boundary_lines_keep_previous(self):
+        """Test update_plot with keep_previous True and decision_boundary_lines present."""
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            keep_previous=True,
+        )
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(100)
+
+        # Simulate a decision_boundary_lines with set_alpha and set_color
+        class DummyLine:
+            def set_alpha(self, a):
+                self.alpha = a
+
+            def set_color(self, c):
+                self.color = c
+
+        dummy_line = DummyLine()
+        animator.decision_boundary = None
+        animator.decision_boundary_lines = dummy_line
+        animator.previous_decision_lines = []
+        with suppress_print():
+            animator.update_plot(100)
+
+    def test_update_plot_decision_boundary_lines_remove_exception(self):
+        """Test update_plot handles exception when removing decision_boundary_lines."""
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+        )
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(100)
+
+        # Simulate a decision_boundary_lines with no remove but with collections
+        class DummyLines:
+            collections = [type("C", (), {"remove": lambda self: None})()]
+
+        animator.decision_boundary = None
+        animator.decision_boundary_lines = DummyLines()
+        with suppress_print():
+            animator.update_plot(100)
+
+    def test_update_plot_no_metric_fn(self):
+        """Test update_plot when metric_fn is None (else branch)."""
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+        )
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(100)
+        with suppress_print():
+            result = animator.update_plot(100)
+        self.assertIsInstance(result, tuple)
+
+    def test_update_plot_multiclass_return_values(self):
+        """Test update_plot return values for multiclass (non-binary) case."""
+        # 3-class data
+        X, y = make_classification(
+            n_samples=100,
+            n_features=2,
+            n_redundant=0,
+            n_informative=2,
+            n_classes=3,
+            random_state=42,
+        )
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+        )
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(100)
+        # No metric progression
+        with suppress_print():
+            result = animator.update_plot(100)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 1)
+
+    def test_update_plot_multiclass_with_metric_progression(self):
+        """Test update_plot return values for multiclass with metric progression."""
+        # 3-class data
+        X, y = make_classification(
+            n_samples=100,
+            n_features=2,
+            n_redundant=0,
+            n_informative=2,
+            n_classes=3,
+            random_state=42,
+        )
+
+        class DummyMetric:
+            __name__ = "dummy"
+
+            def __call__(self, y_true, y_pred):
+                return 1.0
+
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            metric_fn=[DummyMetric()],
+            plot_metric_progression=True,
+        )
+        animator.metric_progression = [[1.0], [1.0]]  # Simulate metric progression
+        animator.metric_lines = [None, None]
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(100)
+        with suppress_print():
+            result = animator.update_plot(100)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+
+    def test_update_plot_binary_with_metric_progression(self):
+        """Test update_plot return values for binary with metric progression."""
+
+        class DummyMetric:
+            __name__ = "dummy"
+
+            def __call__(self, y_true, y_pred):
+                return 1.0
+
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            metric_fn=[DummyMetric()],
+            plot_metric_progression=True,
+        )
+        animator.metric_progression = [[1.0]]
+        animator.metric_lines = [None]
+        animator.setup_plot("Test", "F1", "F2")
+        animator.update_model(100)
+        with suppress_print():
+            result = animator.update_plot(100)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 3)
+
     @classmethod
     def setUpClass(cls):  # NOQA D201
         """Initializes the test suite."""

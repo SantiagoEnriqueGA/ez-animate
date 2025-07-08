@@ -51,9 +51,9 @@ animator.setup_plot(
 max_iter_range = range(
     1, 10_000, 100
 )  # Windows from 10 to 10,000 (total 100 iterations)
-animator.animate(frames=max_iter_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=max_iter_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/utils/plots/animator_wma_forecast_animation.gif",
+#     filename="examples/plots/sega_learn_forecast_ridge.gif",
 #     writer="pillow",
 #     fps=5,
 #     dpi=300,

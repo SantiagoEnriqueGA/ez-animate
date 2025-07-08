@@ -49,9 +49,9 @@ animator.setup_plot(
 
 # Create and save the animation
 n_range = range(10, 111, 1)
-animator.animate(frames=n_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=n_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/plots/animator_wma_forecast_animation.gif",
+#     filename="examples/plots/sega_learn_forecast_ransac.gif",
 #     writer="pillow",
 #     fps=5,
 #     dpi=300,

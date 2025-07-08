@@ -43,9 +43,9 @@ animator.setup_plot(
 
 # Create and save the animation
 alpha_range = np.arange(0.01, 1.0, 0.01)
-animator.animate(frames=alpha_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=alpha_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/utils/plots/animator_lasso.gif",
+#     filename="examples/plots/sklearn_regression_lasso.gif",
 #     writer="pillow",
 #     fps=10,
 #     dpi=300,

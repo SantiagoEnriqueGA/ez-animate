@@ -22,6 +22,9 @@ class ClusteringAnimation(AnimationBase):
         trace_centers=False,
         scaler=None,
         pca_components=2,
+        metric_fn=None,
+        plot_metric_progression=False,
+        max_metric_subplots=1,
         **kwargs,
     ):
         """Initialize the clustering animation class.
@@ -37,6 +40,9 @@ class ClusteringAnimation(AnimationBase):
             trace_centers: Whether to trace the movement of cluster centers over iterations.
             scaler: Optional scaler for data preprocessing.
             pca_components: Number of PCA components for dimensionality reduction.
+            metric_fn: Optional metric function or list of functions (e.g., silhouette_score) to calculate and display during animation.
+            plot_metric_progression: Whether to plot the progression of metrics over frames.
+            max_metric_subplots: Maximum number of metric subplots to display.
             **kwargs: Additional customization options.
         """
         # Input validation
@@ -106,8 +112,11 @@ class ClusteringAnimation(AnimationBase):
             dynamic_parameter=dynamic_parameter,
             static_parameters=static_parameters,
             keep_previous=keep_previous,
+            metric_fn=metric_fn,
             scaler=scaler,
             pca_components=pca_components,
+            plot_metric_progression=plot_metric_progression,
+            max_metric_subplots=max_metric_subplots,
             **kwargs,
         )
         self.keep_previous = keep_previous
@@ -265,7 +274,6 @@ class ClusteringAnimation(AnimationBase):
                     f"{self.model.__name__} must have a 'predict' method or 'labels_' attribute after fitting."
                 ) from None
 
-
         # Plot the points colored by their cluster assignment, distinguishing X_train and X_test
         n_clusters = len(np.unique(cluster_labels))
 
@@ -281,7 +289,7 @@ class ClusteringAnimation(AnimationBase):
         _n_test = self.X_test.shape[0]
         for i in range(n_clusters):
             # Mask for X_train
-            mask_train = (cluster_labels[:n_train] == i)
+            mask_train = cluster_labels[:n_train] == i
             if np.any(mask_train):
                 scatter_train = self.ax.scatter(
                     self.X_train[mask_train, 0],
@@ -294,7 +302,7 @@ class ClusteringAnimation(AnimationBase):
                 )
                 self.cluster_assignments_plot.append(scatter_train)
             # Mask for X_test
-            mask_test = (cluster_labels[n_train:] == i)
+            mask_test = cluster_labels[n_train:] == i
             if np.any(mask_test):
                 scatter_test = self.ax.scatter(
                     self.X_test[mask_test, 0],
@@ -382,43 +390,52 @@ class ClusteringAnimation(AnimationBase):
             ]
             return any(name in fn.__name__ for name in clustering_metrics)
 
+        # --- Metric Handling (match RegressionAnimation style) ---
         if self.metric_fn:
-            frame = round(frame, 2)
-            if len(self.metric_fn) == 1:
-                fn = self.metric_fn[0]
+            y_pred_test = self.model_instance.predict(self.X_test)
+            metrics = []
+            for fn in self.metric_fn:
                 if is_clustering_metric(fn):
-                    metric_value = fn(
-                        self.X_test, self.model_instance.predict(self.X_test)
-                    )
+                    val = fn(self.X_test, y_pred_test)
                 else:
-                    metric_value = fn(
-                        self.y_test, self.model_instance.predict(self.X_test)
-                    )
-                metric_value = round(metric_value, 4)
-                self.ax.set_title(
-                    f"Clustering ({self.dynamic_parameter}={frame}) - {fn.__name__.capitalize()}: {metric_value:.4f}"
-                )
-                print(
-                    f"{self.dynamic_parameter}: {frame}, {fn.__name__.capitalize()}: {metric_value:.4f}",
-                    end="\r",
-                )
+                    val = fn(self.y_test, y_pred_test)
+                metrics.append(round(val, 4))
+            frame_rounded = round(frame, 2)
+            metric_strs = [
+                f"{fn.__name__.capitalize()}: {metric:.4f}"
+                for fn, metric in zip(self.metric_fn, metrics)
+            ]
+            metric_str = ", ".join(metric_strs)
+
+            # Update metric_progression for each metric subplot (if present)
+            if self.metric_progression is not None:
+                for i in range(min(len(metrics), len(self.metric_progression))):
+                    self.metric_progression[i].append(metrics[i])
+                self.update_metric_plot(frame)
+
+            if (
+                self.plot_metric_progression
+                and getattr(self, "metric_lines", None) is not None
+            ):
+                self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
             else:
-                metrics = []
-                for fn in self.metric_fn:
-                    if is_clustering_metric(fn):
-                        val = fn(self.X_test, self.model_instance.predict(self.X_test))
-                    else:
-                        val = fn(self.y_test, self.model_instance.predict(self.X_test))
-                    metrics.append(round(val, 4))
                 self.ax.set_title(
-                    f"Clustering ({self.dynamic_parameter}={frame}) - {', '.join([f'{fn.__name__.capitalize()}: {metric:.2f}' for fn, metric in zip(self.metric_fn, metrics)])}"
+                    f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
+                    fontsize=10,
                 )
-                print(
-                    f"{self.dynamic_parameter}: {frame}, {', '.join([f'{fn.__name__.capitalize()}: {metric:.4f}' for fn, metric in zip(self.metric_fn, metrics)])}",
-                    end="\r",
-                )
+            print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:
             self.ax.set_title(f"Clustering ({self.dynamic_parameter}={frame})")
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
+        # Return all artists that are updated for blitting
+        if (
+            self.plot_metric_progression
+            and getattr(self, "metric_lines", None) is not None
+        ):
+            return tuple(
+                self.cluster_assignments_plot
+                + self.cluster_centers_plot
+                + [self.metric_lines]
+            )
         return tuple(self.cluster_assignments_plot + self.cluster_centers_plot)

@@ -11,9 +11,9 @@ A high-level, declarative Python package for creating common Matplotlib animatio
 See the navigation for installation, usage, API, and contribution details.
 
 ## Example Animations
-### Regression Animation with Lasso
-This animation demonstrates Lasso regression, showing how the model fits the data as the *alpha* parameter (regularization strength) changes dynamically.
-![Lasso Regression Animation](plots/animator_lasso.gif)
+### Regression Animation with SGD
+This animation demonstrates SGD regression, showing how the model fits the data as the *max_iter* parameter increases. You can see how the model's predictions with each iteration change, and how the metrics evolve over time.
+![SGD Regression Animation](plots/animator_sgd.gif)
 
 ### Exponential Moving Average Forecast Animation
 This animation illustrates how the Exponential Moving Average (EMA) forecast evolves over time, highlighting the smoothing effect of different *alpha* values.

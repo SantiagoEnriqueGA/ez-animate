@@ -45,9 +45,9 @@ animator.setup_plot(
 
 # Create and save the animation
 max_iter_range = range(1, 2500, 100)  # Frames from 1 to 2,500 (total 25 iterations)
-animator.animate(frames=max_iter_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=max_iter_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/utils/plots/animator_logistic_regression.gif",
+#     filename="examples/plots/sega_learn_classification_logisticRegression.gif",
 #     writer="pillow",
 #     fps=3,
 #     dpi=300,

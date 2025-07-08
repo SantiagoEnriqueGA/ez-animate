@@ -48,7 +48,7 @@ animator.animate(
 
 # To save the animation, uncomment the following lines:
 # animator.save(
-#     filename="examples/plots/animator_kmeans.gif",
+#     filename="examples/plots/sega_learn_clustering_dbscan.gif",
 #     writer="pillow",
 #     fps=2,
 #     dpi=150,

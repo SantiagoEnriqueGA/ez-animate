@@ -46,9 +46,9 @@ animator.setup_plot(
 
 # Create and save the animation
 max_iter_range = range(1, 2500, 100)
-animator.animate(frames=max_iter_range, interval=150, blit=True, repeat=False)
+animator.animate(frames=max_iter_range, interval=150, blit=False, repeat=True)
 # animator.save(
-#     filename="examples/utils/plots/animator_perceptron.gif",
+#     filename="examples/plots/sega_learn_classification_perceptron.gif",
 #     writer="pillow",
 #     fps=3,
 #     dpi=300,
