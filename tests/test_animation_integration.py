@@ -28,18 +28,31 @@ from sega_learn.utils import (
 )
 
 
+class DummyAnimation(AnimationBase):  # noqa: D101
+    def __init__(self, *args, **kwargs):  # noqa: D107
+        self._set_kwargs()
+        self.metric_fn = kwargs.get("metric_fn", [])
+        self.max_metric_subplots = kwargs.get("max_metric_subplots", 1)
+        self.dynamic_parameter = kwargs.get("dynamic_parameter", "param")
+        self.static_parameters = kwargs.get("static_parameters", {})
+        self.metric_progression = [[] for _ in range(len(self.metric_fn))]
+        self.keep_previous = kwargs.get("keep_previous", False)
+
+    def update_model(self, frame):  # noqa: D102
+        pass
+
+    def update_plot(self, frame):  # noqa: D102
+        pass
+
+    def plot_metric_progression(self, frame):  # noqa: D102
+        pass
+
+
 class TestAnimationBase(BaseTest):
     """Base class for animation tests."""
 
     def test_update_metric_plot_basic(self):
         """Test update_metric_plot updates metric lines and annotations correctly."""
-
-        class DummyAnimation(AnimationBase):
-            def update_model(self, frame):
-                pass
-
-            def update_plot(self, frame):
-                pass
 
         # Dummy metric function
         def dummy_metric(y_true, y_pred):
@@ -72,13 +85,6 @@ class TestAnimationBase(BaseTest):
 
     def test_update_metric_plot_empty(self):
         """Test update_metric_plot with empty progression does not fail and annotation is None."""
-
-        class DummyAnimation(AnimationBase):
-            def update_model(self, frame):
-                pass
-
-            def update_plot(self, frame):
-                pass
 
         def dummy_metric(y_true, y_pred):
             return 0

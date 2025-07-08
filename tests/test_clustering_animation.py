@@ -24,6 +24,100 @@ from sklearn.metrics import accuracy_score, calinski_harabasz_score, silhouette_
 class TestClusteringAnimation(BaseTest):
     """Unit test for the ClusteringAnimation class."""
 
+    def test_set_kwargs_clustering_and_general(self):
+        """Test that _set_kwargs sets Clustering and General kwargs correctly."""
+        # Generate synthetic clustering data
+        X = np.random.rand(100, 2)
+        # Custom kwargs for clustering and general
+        custom_kwargs = {
+            "ax_kwargs": {"fontsize": 17},
+            "legend_kwargs": {"fontsize": 11},
+            "title_kwargs": {"fontsize": 14},
+            "xlabel_kwargs": {"fontsize": 9},
+            "ylabel_kwargs": {"fontsize": 9},
+            "grid_kwargs": {"alpha": 0.2},
+            "scatter_kwargs": {"alpha": 0.8, "edgecolors": "b", "zorder": 4},
+            "scatter_kwargs_test": {"alpha": 0.5, "marker": "s", "zorder": 3},
+            "cluster_gray_train_kwargs": {
+                "c": "gray",
+                "alpha": 0.6,
+                "edgecolors": "r",
+                "s": 60,
+            },
+            "cluster_gray_test_kwargs": {
+                "c": "lightgray",
+                "alpha": 0.4,
+                "s": 40,
+                "marker": "d",
+            },
+            "cluster_center_kwargs": {
+                "marker": "P",
+                "s": 200,
+                "edgecolors": "g",
+                "label": "Centers",
+                "zorder": 5,
+            },
+            "prev_center_kwargs": {
+                "marker": "X",
+                "c": "orange",
+                "edgecolors": "gray",
+                "s": 80,
+                "zorder": 2,
+            },
+            "trace_line_kwargs": {
+                "linestyle": ":",
+                "linewidth": 1.5,
+                "alpha": 0.7,
+                "zorder": 1,
+            },
+        }
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=X,
+            test_size=0.2,
+            dynamic_parameter="n_clusters",
+        )
+        animator._set_kwargs(**custom_kwargs, subclass="ClusteringAnimation")
+        # General kwargs
+        self.assertEqual(animator.ax_kwargs["fontsize"], 17)
+        self.assertEqual(animator.legend_kwargs["fontsize"], 11)
+        self.assertEqual(animator.title_kwargs["fontsize"], 14)
+        self.assertEqual(animator.xlabel_kwargs["fontsize"], 9)
+        self.assertEqual(animator.ylabel_kwargs["fontsize"], 9)
+        self.assertEqual(animator.grid_kwargs["alpha"], 0.2)
+        # Clustering-specific kwargs
+        self.assertEqual(animator.scatter_kwargs["alpha"], 0.8)
+        self.assertEqual(animator.scatter_kwargs["edgecolors"], "b")
+        self.assertEqual(animator.scatter_kwargs["zorder"], 4)
+        self.assertEqual(animator.scatter_kwargs_test["alpha"], 0.5)
+        self.assertEqual(animator.scatter_kwargs_test["marker"], "s")
+        self.assertEqual(animator.scatter_kwargs_test["zorder"], 3)
+        self.assertEqual(animator.cluster_gray_train_kwargs["c"], "gray")
+        self.assertEqual(animator.cluster_gray_train_kwargs["alpha"], 0.6)
+        self.assertEqual(animator.cluster_gray_train_kwargs["edgecolors"], "r")
+        self.assertEqual(animator.cluster_gray_train_kwargs["s"], 60)
+        self.assertEqual(animator.cluster_gray_test_kwargs["c"], "lightgray")
+        self.assertEqual(animator.cluster_gray_test_kwargs["alpha"], 0.4)
+        self.assertEqual(animator.cluster_gray_test_kwargs["s"], 40)
+        self.assertEqual(animator.cluster_gray_test_kwargs["marker"], "d")
+        self.assertEqual(animator.cluster_center_kwargs["marker"], "P")
+        self.assertEqual(animator.cluster_center_kwargs["s"], 200)
+        self.assertEqual(animator.cluster_center_kwargs["edgecolors"], "g")
+        self.assertEqual(animator.cluster_center_kwargs["label"], "Centers")
+        self.assertEqual(animator.cluster_center_kwargs["zorder"], 5)
+        self.assertEqual(animator.prev_center_kwargs["marker"], "X")
+        self.assertEqual(animator.prev_center_kwargs["c"], "orange")
+        self.assertEqual(animator.prev_center_kwargs["edgecolors"], "gray")
+        self.assertEqual(animator.prev_center_kwargs["s"], 80)
+        self.assertEqual(animator.prev_center_kwargs["zorder"], 2)
+        self.assertEqual(animator.trace_line_kwargs["linestyle"], ":")
+        self.assertEqual(animator.trace_line_kwargs["linewidth"], 1.5)
+        self.assertEqual(animator.trace_line_kwargs["alpha"], 0.7)
+        self.assertEqual(animator.trace_line_kwargs["zorder"], 1)
+        # Defaults for unset clustering-specific kwargs
+        self.assertIn("line_kwargs", vars(animator))
+        plt.close("all")
+
     def test_update_plot_removal_exceptions(self):
         """Test update_plot covers the except Exception: pass for cluster_centers_plot and cluster_assignments_plot removal."""
         animator = ClusteringAnimation(

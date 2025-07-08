@@ -23,6 +23,49 @@ from sega_learn.utils import (
 class TestRegressionAnimation(BaseTest):
     """Unit test for the RegressionAnimation class."""
 
+    def test_set_kwargs_regression_and_general(self):
+        """Test that _set_kwargs sets Regression and General kwargs correctly."""
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+        )
+        # Custom kwargs for regression and general
+        custom_kwargs = {
+            "ax_kwargs": {"fontsize": 20},
+            "legend_kwargs": {"fontsize": 15},
+            "title_kwargs": {"fontsize": 18},
+            "xlabel_kwargs": {"fontsize": 12},
+            "ylabel_kwargs": {"fontsize": 12},
+            "grid_kwargs": {"alpha": 0.3},
+            "scatter_kwargs": {"color": "purple", "zorder": 5},
+            "scatter_kwargs_test": {"color": "orange", "marker": "^", "zorder": 4},
+            "line_kwargs": {"color": "black", "zorder": 10},
+        }
+        animator._set_kwargs(**custom_kwargs, subclass="RegressionAnimation")
+        # General kwargs
+        self.assertEqual(animator.ax_kwargs["fontsize"], 20)
+        self.assertEqual(animator.legend_kwargs["fontsize"], 15)
+        self.assertEqual(animator.title_kwargs["fontsize"], 18)
+        self.assertEqual(animator.xlabel_kwargs["fontsize"], 12)
+        self.assertEqual(animator.ylabel_kwargs["fontsize"], 12)
+        self.assertEqual(animator.grid_kwargs["alpha"], 0.3)
+        # Regression-specific kwargs
+        self.assertEqual(animator.scatter_kwargs["color"], "purple")
+        self.assertEqual(animator.scatter_kwargs["zorder"], 5)
+        self.assertEqual(animator.scatter_kwargs_test["color"], "orange")
+        self.assertEqual(animator.scatter_kwargs_test["marker"], "^")
+        self.assertEqual(animator.scatter_kwargs_test["zorder"], 4)
+        self.assertEqual(animator.line_kwargs["color"], "black")
+        self.assertEqual(animator.line_kwargs["zorder"], 10)
+        # Defaults for unset regression-specific kwargs
+        self.assertIn("decision_boundary_kwargs", vars(animator))
+        self.assertIn("train_line_kwargs", vars(animator))
+        self.assertIn("cluster_gray_train_kwargs", vars(animator))
+        plt.close("all")
+
     def test_keep_previous_max_previous_behavior(self):
         """Test keep_previous and max_previous logic in update_plot."""
         animator = RegressionAnimation(

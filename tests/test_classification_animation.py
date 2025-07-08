@@ -22,6 +22,54 @@ from sega_learn.utils import (
 class TestClassificationAnimation(BaseTest):
     """Unit test for the ClassificationAnimation class."""
 
+    def test_set_kwargs_classification_and_general(self):
+        """Test that _set_kwargs sets Classification and General kwargs correctly."""
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+        )
+        # Custom kwargs for classification and general
+        custom_kwargs = {
+            "ax_kwargs": {"fontsize": 22},
+            "legend_kwargs": {"fontsize": 16},
+            "title_kwargs": {"fontsize": 19},
+            "xlabel_kwargs": {"fontsize": 13},
+            "ylabel_kwargs": {"fontsize": 13},
+            "grid_kwargs": {"alpha": 0.4},
+            "scatter_kwargs": {"edgecolors": "r", "alpha": 0.9, "zorder": 7},
+            "scatter_kwargs_test": {"marker": "*", "alpha": 0.8, "zorder": 6},
+            "decision_boundary_kwargs": {"alpha": 0.5, "cmap": "viridis", "zorder": 4},
+            "decision_boundary_line_kwargs": {"linewidths": 2, "colors": "magenta"},
+        }
+        animator._set_kwargs(**custom_kwargs, subclass="ClassificationAnimation")
+        # General kwargs
+        self.assertEqual(animator.ax_kwargs["fontsize"], 22)
+        self.assertEqual(animator.legend_kwargs["fontsize"], 16)
+        self.assertEqual(animator.title_kwargs["fontsize"], 19)
+        self.assertEqual(animator.xlabel_kwargs["fontsize"], 13)
+        self.assertEqual(animator.ylabel_kwargs["fontsize"], 13)
+        self.assertEqual(animator.grid_kwargs["alpha"], 0.4)
+        # Classification-specific kwargs
+        self.assertEqual(animator.scatter_kwargs["edgecolors"], "r")
+        self.assertEqual(animator.scatter_kwargs["alpha"], 0.9)
+        self.assertEqual(animator.scatter_kwargs["zorder"], 7)
+        self.assertEqual(animator.scatter_kwargs_test["marker"], "*")
+        self.assertEqual(animator.scatter_kwargs_test["alpha"], 0.8)
+        self.assertEqual(animator.scatter_kwargs_test["zorder"], 6)
+        self.assertEqual(animator.decision_boundary_kwargs["alpha"], 0.5)
+        self.assertEqual(animator.decision_boundary_kwargs["cmap"], "viridis")
+        self.assertEqual(animator.decision_boundary_kwargs["zorder"], 4)
+        self.assertEqual(animator.decision_boundary_line_kwargs["linewidths"], 2)
+        self.assertEqual(animator.decision_boundary_line_kwargs["colors"], "magenta")
+        # Defaults for unset classification-specific kwargs
+        self.assertIn("line_kwargs", vars(animator))
+        self.assertIn("train_line_kwargs", vars(animator))
+        self.assertIn("cluster_gray_train_kwargs", vars(animator))
+        plt.close("all")
+
     def test_update_plot_decision_boundary_remove_exception(self):
         """Test update_plot handles exception when removing decision_boundary."""
         animator = ClassificationAnimation(
