@@ -8,9 +8,9 @@
   </a>
   <a href="https://pypi.org/project/ez-animate/">
     <img src="https://img.shields.io/pypi/v/ez-animate.svg" alt="PyPI Version">
-  <a href="https://pepy.tech/project/ez-animate">
+<!--   <a href="https://pepy.tech/project/ez-animate">
     <img src="https://static.pepy.tech/badge/ez-animate" alt="Downloads">
-  </a>
+  </a> -->
   </a>
   <a href="https://pypi.org/project/ez-animate/">
     <img src="https://img.shields.io/pypi/pyversions/ez-animate.svg" alt="Python Versions">
@@ -51,7 +51,6 @@ A high-level, declarative Python package for creating common Matplotlib animatio
 
 ## Installation
 
-**Pending PyPI release. For now, install directly from GitHub**
 ```bash
 pip install ez-animate
 ```
