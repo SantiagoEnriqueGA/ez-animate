@@ -102,6 +102,7 @@ class ClassificationAnimation(AnimationBase):
             max_metric_subplots=max_metric_subplots,
             **kwargs,
         )
+        self._set_kwargs(**kwargs, subclass="ClassificationAnimation")
 
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test = X_test, y_test
@@ -145,9 +146,7 @@ class ClassificationAnimation(AnimationBase):
                 self.X_train[class_mask, 1],
                 color=self.colors[i],
                 label=f"Train Class {class_value}",
-                edgecolors="k",
-                alpha=0.7,
-                zorder=2,
+                **self.scatter_kwargs,
             )
             self.scatter_train_dict[class_value] = scatter
 
@@ -159,9 +158,7 @@ class ClassificationAnimation(AnimationBase):
                 self.X_test[class_mask, 1],
                 color=self.colors[i],
                 label=f"Test Class {class_value}",
-                marker="x",  # Different marker for test points
-                alpha=0.7,
-                zorder=2,
+                **self.scatter_kwargs_test,
             )
             self.scatter_test_dict[class_value] = scatter
 
@@ -241,10 +238,8 @@ class ClassificationAnimation(AnimationBase):
             self.xx,
             self.yy,
             Z,
-            alpha=0.25,
-            cmap=plt.cm.coolwarm,
             levels=np.arange(len(self.unique_classes) + 1) - 0.5,
-            zorder=1,
+            **self.decision_boundary_kwargs,
         )
 
         # If only two classes, plot the decision boundary lines
@@ -254,8 +249,7 @@ class ClassificationAnimation(AnimationBase):
                 self.yy,
                 Z,
                 levels=[0.5],
-                linewidths=1,
-                colors="black",
+                **self.decision_boundary_line_kwargs,
             )
 
         # --- Metric Handling (match RegressionAnimation style) ---
@@ -281,15 +275,20 @@ class ClassificationAnimation(AnimationBase):
                 self.plot_metric_progression
                 and getattr(self, "metric_lines", None) is not None
             ):
-                self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
+                self.ax.set_title(
+                    f"{self.dynamic_parameter}={frame_rounded}", **self.title_kwargs
+                )
             else:
                 self.ax.set_title(
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
-                    fontsize=10,
+                    **self.title_kwargs,
                 )
             print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:
-            self.ax.set_title(f"Classification ({self.dynamic_parameter}={frame})")
+            self.ax.set_title(
+                f"Classification ({self.dynamic_parameter}={frame})",
+                **self.title_kwargs,
+            )
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting

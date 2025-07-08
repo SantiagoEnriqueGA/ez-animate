@@ -119,6 +119,7 @@ class ClusteringAnimation(AnimationBase):
             max_metric_subplots=max_metric_subplots,
             **kwargs,
         )
+        self._set_kwargs(**kwargs, subclass="ClusteringAnimation")
         self.keep_previous = keep_previous
         self.trace_centers = trace_centers
         self.previous_centers = []
@@ -169,8 +170,7 @@ class ClusteringAnimation(AnimationBase):
                     self.X_train[mask, 1],
                     color=self.colors[i],
                     label=f"Train Class {label}",
-                    alpha=0.7,
-                    edgecolors="k",
+                    **self.scatter_kwargs,
                 )
             # Plot test data points
             for i, label in enumerate(self.unique_labels):
@@ -180,8 +180,7 @@ class ClusteringAnimation(AnimationBase):
                     self.X_test[mask, 1],
                     color=self.colors[i],
                     label=f"Test Class {label}",
-                    alpha=0.3,
-                    marker="x",
+                    **self.scatter_kwargs_test,
                 )
 
         else:
@@ -189,18 +188,12 @@ class ClusteringAnimation(AnimationBase):
             self.ax.scatter(
                 self.X_train[:, 0],
                 self.X_train[:, 1],
-                c="gray",
-                alpha=0.5,
-                edgecolors="w",
-                s=50,
+                **self.cluster_gray_train_kwargs,
             )
             self.ax.scatter(
                 self.X_test[:, 0],
                 self.X_test[:, 1],
-                c="lightgray",
-                alpha=0.5,
-                s=50,
-                marker="x",
+                **self.cluster_gray_test_kwargs,
             )
 
         # Set plot limits with some padding
@@ -296,9 +289,7 @@ class ClusteringAnimation(AnimationBase):
                     self.X_train[mask_train, 1],
                     color=cmap(i),
                     label=f"Cluster {i} (train)",
-                    alpha=0.7,
-                    edgecolors="k",
-                    zorder=2,
+                    **self.scatter_kwargs,
                 )
                 self.cluster_assignments_plot.append(scatter_train)
             # Mask for X_test
@@ -309,9 +300,7 @@ class ClusteringAnimation(AnimationBase):
                     self.X_test[mask_test, 1],
                     color=cmap(i),
                     label=f"Cluster {i} (test)",
-                    alpha=0.7,
-                    marker="x",
-                    zorder=2,
+                    **self.scatter_kwargs_test,
                 )
                 self.cluster_assignments_plot.append(scatter_test)
 
@@ -324,12 +313,8 @@ class ClusteringAnimation(AnimationBase):
             center_plot = self.ax.scatter(
                 centers[:, 0],
                 centers[:, 1],
-                marker="*",
                 c=cmap(np.arange(n_clusters)),
-                s=300,
-                edgecolors="black",
-                label="Centers",
-                zorder=3,
+                **self.cluster_center_kwargs,
             )
             self.cluster_centers_plot.append(center_plot)
 
@@ -340,15 +325,12 @@ class ClusteringAnimation(AnimationBase):
             for i, prev in enumerate(self.previous_centers[:-1]):
                 # Alpha ranges from 0.1 to 0.5 as i goes from 0 to n_prev-2
                 alpha = 0.1 + 0.4 / max(1, n_prev - 1) * i if n_prev > 1 else 0.1
+                prev_kwargs = dict(self.prev_center_kwargs)
+                prev_kwargs["alpha"] = alpha
                 prev_plot = self.ax.scatter(
                     prev[:, 0],
                     prev[:, 1],
-                    marker="*",
-                    c="yellow",
-                    edgecolors="gray",
-                    s=100,
-                    alpha=alpha,
-                    zorder=1,
+                    **prev_kwargs,
                 )
                 self.cluster_centers_plot.append(prev_plot)
 
@@ -363,14 +345,12 @@ class ClusteringAnimation(AnimationBase):
                 )  # shape: (n_iters, n_centers, 2)
                 n_centers = prev_arr.shape[1]
                 for k in range(n_centers):
+                    trace_kwargs = dict(self.trace_line_kwargs)
+                    trace_kwargs["color"] = cmap(k)
                     self.ax.plot(
                         prev_arr[:, k, 0],
                         prev_arr[:, k, 1],
-                        color=cmap(k),
-                        linestyle="--",
-                        linewidth=2.5,
-                        alpha=1,
-                        zorder=2,
+                        **trace_kwargs,
                     )
             else:
                 # Warning

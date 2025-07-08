@@ -101,6 +101,7 @@ class RegressionAnimation(AnimationBase):
             max_metric_subplots=max_metric_subplots,
             **kwargs,
         )
+        self._set_kwargs(**kwargs, subclass="RegressionAnimation")
 
         # Split training and testing data into features and target
         self.X_train, self.y_train = X_train, y_train
@@ -134,27 +135,24 @@ class RegressionAnimation(AnimationBase):
             self.X_train[:, 0],
             self.y_train,
             label="Training Data",
-            color="blue",
-            zorder=3,
+            **self.scatter_kwargs,
         )
-        # Plot test data points wiht different marker
+        # Plot test data points with different marker
         self.scatter_points_test = self.ax.scatter(
             self.X_test[:, 0],
             self.y_test,
             label="Test Data",
-            color="lightcoral",
-            marker="x",
-            zorder=2,
+            **self.scatter_kwargs_test,
         )
 
         # Create a placeholder for the predicted regression line
         (self.predicted_line,) = self.ax.plot(
-            [], [], label="Regression Line", color="red", zorder=3
+            [], [], label="Regression Line", **self.line_kwargs
         )
 
         if self.add_legend:
             # Add legend to the plot
-            self.ax.legend(loc=legend_loc)
+            self.ax.legend(loc=legend_loc, **self.legend_kwargs)
 
     def update_model(self, frame):
         """Update the regression model for the current frame.
@@ -190,15 +188,19 @@ class RegressionAnimation(AnimationBase):
             self.previous_predicted_lines.append(self.predicted_line)
             for i, line in enumerate(self.previous_predicted_lines):
                 line.set_alpha(0.1 + (0.4 / len(self.previous_predicted_lines)) * i)
-                line.set_color("lightcoral")
+                # Optionally set color for previous lines, or leave as is
 
             # Add a new predicted line
+            # Remove zorder from kwargs to avoid conflicts
+            line_kwargs = {
+                **self.line_kwargs,
+                "zorder": len(self.previous_predicted_lines) + 1,
+            }
             (self.predicted_line,) = self.ax.plot(
                 [],
                 [],
                 label="Regression Line",
-                color="red",
-                zorder=len(self.previous_predicted_lines) + 1,
+                **line_kwargs,
             )
 
         # Update the regression line with the predicted values
@@ -227,18 +229,22 @@ class RegressionAnimation(AnimationBase):
             metric_str = ", ".join(metric_strs)
 
             if self.plot_metric_progression:
-                self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
+                self.ax.set_title(
+                    f"{self.dynamic_parameter}={frame_rounded}", **self.title_kwargs
+                )
             else:
                 self.ax.set_title(
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
-                    fontsize=10,
+                    **self.title_kwargs,
                 )
             print(
                 f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}",
                 end="\r",
             )
         else:
-            self.ax.set_title(f"Regression ({self.dynamic_parameter}={frame})")
+            self.ax.set_title(
+                f"Regression ({self.dynamic_parameter}={frame})", **self.title_kwargs
+            )
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting
