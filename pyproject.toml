@@ -65,7 +65,7 @@ Repository = "https://github.com/SantiagoEnriqueGA/ez-animate"
 target-version = "py313"
 
 # Define directories/files to check
-src = ["src", "tests", "examples"]
+src = ["src", "tests", "examples", "docs"]
 
 # Exclude directories/files Ruff should ignore
 exclude = [

@@ -27,6 +27,15 @@ jobs:
         run: |
           pip install mkdocs mkdocs-material pymdown-extensions
 
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Generate thumbnails
+        run: python docs/generate_thumbs.py
+
+      - name: Generate gallery
+        run: python docs/generate_gallery.py
+
       - name: Deploy to GitHub Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
