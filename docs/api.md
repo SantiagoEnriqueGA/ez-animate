@@ -27,7 +27,6 @@ RegressionAnimation(
     metric_fn=None,
     plot_metric_progression=False,
     max_metric_subplots=1,
-    **kwargs,
     **kwargs
 )
 ```
@@ -45,7 +44,7 @@ RegressionAnimation(
 - `metric_fn`: Optional metric function or list of functions (e.g., MSE, R2) to calculate and display during animation.
 - `plot_metric_progression`: Whether to plot the progression of the metric over time.
 - `max_metric_subplots`: Maximum number of subplots to show for metric progression (if multiple metrics).
-- `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
+- `**kwargs`: Additional keyword arguments for plot customization. See the "Customization with **kwargs**" section for details.
 
 
 ### ClassificationAnimation
@@ -90,7 +89,7 @@ ClassificationAnimation(
 - `metric_fn`: Optional metric function or list of functions (e.g., accuracy, F1) to calculate and display during animation.
 - `plot_metric_progression`: Whether to plot the progression of the metric over time.
 - `max_metric_subplots`: Maximum number of subplots to show for metric progression (if multiple metrics).
-- `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
+- `**kwargs`: Additional keyword arguments for plot customization. See the "Customization with **kwargs**" section for details.
 
 
 
@@ -137,7 +136,7 @@ ClusteringAnimation(
 - `metric_fn`: Optional metric function or list of functions (e.g., silhouette_score) to calculate and display during animation.
 - `plot_metric_progression`: Whether to plot the progression of metrics over frames.
 - `max_metric_subplots`: Maximum number of metric subplots to display.
-- `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
+- `**kwargs`: Additional keyword arguments for plot customization. See the "Customization with **kwargs**" section for details.
 
 
 ### ForecastingAnimation
@@ -179,7 +178,7 @@ ForecastingAnimation(
 - `metric_fn`: Optional metric function or list of functions (e.g., MSE, MAE) to calculate and display during animation.
 - `plot_metric_progression`: Whether to plot the progression of metrics over frames.
 - `max_metric_subplots`: Maximum number of metric subplots to display.
-- `**kwargs`: Additional keyword arguments for customization (e.g., `title`, `xlabel`, `ylabel`).
+- `**kwargs`: Additional keyword arguments for plot customization. See the "Customization with **kwargs**" section for details.
 
 
 ## Common Methods
@@ -226,3 +225,78 @@ Save the animation to a file (e.g., GIF or MP4).
 show()
 ```
 Display the animation in a window or notebook.
+
+## Customization with `**kwargs`
+
+You can customize the appearance of various plot elements by passing dictionaries of keyword arguments to the animation class constructor. These dictionaries are passed directly to the underlying Matplotlib plotting functions.
+
+### Common Keyword Arguments
+These `kwargs` can be used with any animation class.
+
+#### General Plot Customization
+- `title_kwargs`: Customizes the main plot title. Passed to `ax.set_title()`.
+  - Example: `title_kwargs={'fontsize': 16, 'fontweight': 'bold'}`
+- `suptitle_kwargs`: Customizes the figure's super-title. Passed to `fig.suptitle()`.
+  - Example: `suptitle_kwargs={'fontsize': 20, 'y': 0.98}`
+- `xlabel_kwargs`: Customizes the x-axis label. Passed to `ax.set_xlabel()`.
+  - Example: `xlabel_kwargs={'fontsize': 12}`
+- `ylabel_kwargs`: Customizes the y-axis label. Passed to `ax.set_ylabel()`.
+  - Example: `ylabel_kwargs={'fontsize': 12}`
+- `ax_kwargs`: Customizes general axes properties. Passed to `ax.tick_params()`.
+  - Example: `ax_kwargs={'labelsize': 10}`
+- `legend_kwargs`: Customizes the plot legend. Passed to `ax.legend()`.
+  - Example: `legend_kwargs={'loc': 'lower right', 'fontsize': 'small'}`
+- `grid_kwargs`: Customizes the plot grid lines. Passed to `ax.grid()`.
+  - Example: `grid_kwargs={'linestyle': ':', 'alpha': 0.6}`
+
+#### Metric Subplot Customization
+These `kwargs` are used when `plot_metric_progression=True` in the animation class constructor. They customize the appearance of the metric subplots and their corresponding lines.
+
+- `metric_title_kwargs`: Customizes the metric subplot title(s).
+- `metric_line_kwargs`: Customizes the metric progression line(s).
+- `metric_ax_kwargs`: Customizes the metric subplot axes.
+- `metric_xlabel_kwargs`: Customizes the metric subplot x-axis label(s).
+- `metric_ylabel_kwargs`: Customizes the metric subplot y-axis label(s).
+- `metric_annotation_kwargs`: Customizes the text annotation for the metric value.
+
+### Class-Specific Keyword Arguments
+The following `kwargs` are used with specific animation classes. They customize the appearance of the corresponding plot elements.
+
+#### RegressionAnimation
+- `scatter_kwargs`: Customizes the scatter plot for training data points.
+  - Example: `scatter_kwargs={'color': 'green', 's': 50}`
+- `scatter_kwargs_test`: Customizes the scatter plot for test data points.
+  - Example: `scatter_kwargs_test={'color': 'orange', 'marker': 's'}`
+- `line_kwargs`: Customizes the fitted regression line.
+  - Example: `line_kwargs={'color': 'purple', 'linewidth': 3}`
+
+#### ClassificationAnimation
+- `scatter_kwargs`: Customizes the scatter plot for training data points.
+  - Example: `scatter_kwargs={'cmap': 'viridis', 's': 60}`
+- `scatter_kwargs_test`: Customizes the scatter plot for test data points.
+  - Example: `scatter_kwargs_test={'marker': 'D', 's': 60}`
+- `decision_boundary_kwargs`: Customizes the filled decision boundary regions. Passed to `ax.contourf()`.
+  - Example: `decision_boundary_kwargs={'alpha': 0.3, 'cmap': 'plasma'}`
+- `decision_boundary_line_kwargs`: Customizes the decision boundary contour lines. Passed to `ax.contour()`.
+  - Example: `decision_boundary_line_kwargs={'linewidths': 2, 'colors': 'k'}`
+
+#### ClusteringAnimation
+- `scatter_kwargs`: Customizes the scatter plot for clustered training data points.
+- `scatter_kwargs_test`: Customizes the scatter plot for clustered test data points.
+- `cluster_gray_train_kwargs`: Customizes the appearance of un-clustered training points.
+- `cluster_gray_test_kwargs`: Customizes the appearance of un-clustered test points.
+- `cluster_center_kwargs`: Customizes the cluster center markers.
+  - Example: `cluster_center_kwargs={'marker': 'X', 's': 400, 'c': 'red'}`
+- `prev_center_kwargs`: Customizes the markers for previous cluster centers (if `keep_previous=True`).
+- `trace_line_kwargs`: Customizes the lines tracing cluster center movement (if `trace_centers=True`).
+  - Example: `trace_line_kwargs={'linestyle': '-', 'linewidth': 1.5}`
+
+#### ForecastingAnimation
+- `train_line_kwargs`: Customizes the line plot for the training time series.
+  - Example: `train_line_kwargs={'color': 'gray', 'label': 'Historical Data'}`
+- `vline_kwargs`: Customizes the vertical line indicating the start of the forecast.
+  - Example: `vline_kwargs={'color': 'red', 'linestyle': ':'}`
+- `fitted_line_kwargs`: Customizes the line for the model's fitted values on the training data.
+  - Example: `fitted_line_kwargs={'color': 'orange', 'zorder': 4}`
+- `forecast_line_kwargs`: Customizes the line for the forecasted values.
+  - Example: `forecast_line_kwargs={'color': 'purple', 'marker': 'o'}`
