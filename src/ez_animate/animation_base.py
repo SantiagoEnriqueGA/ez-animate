@@ -78,6 +78,8 @@ class AnimationBase(ABC):
             static_parameters if static_parameters is not None else {}
         )
         self.keep_previous = keep_previous
+
+        # Store additional keyword arguments
         self.kwargs = kwargs
 
         # Optional metric function (e.g., MSE)
@@ -103,6 +105,107 @@ class AnimationBase(ABC):
         self.metric_axes = None  # List of axes for metrics
         self.metric_lines = None  # List of lines for metrics
 
+    def _set_kwargs(self, subclass=None, **kwargs):
+        """Set the keyword arguments for plot customization, with defaults for all animation types."""
+        # General defaults
+        self.ax_kwargs = kwargs.get("ax_kwargs", {"fontsize": 10})
+        self.legend_kwargs = kwargs.get("legend_kwargs", {})
+        self.title_kwargs = kwargs.get("title_kwargs", {})
+        self.suptitle_kwargs = kwargs.get("suptitle_kwargs", {})
+        self.xlabel_kwargs = kwargs.get("xlabel_kwargs", {})
+        self.ylabel_kwargs = kwargs.get("ylabel_kwargs", {})
+        self.grid_kwargs = kwargs.get("grid_kwargs", {})
+
+        # Set default values for scatter plot customization based on subclass
+        if subclass == "RegressionAnimation":
+            self.scatter_kwargs = kwargs.get(
+                "scatter_kwargs", {"color": "blue", "zorder": 3}
+            )
+            self.scatter_kwargs_test = kwargs.get(
+                "scatter_kwargs_test",
+                {"color": "lightcoral", "marker": "x", "zorder": 2},
+            )
+        elif subclass == "ClassificationAnimation":
+            self.scatter_kwargs = kwargs.get(
+                "scatter_kwargs", {"edgecolors": "k", "alpha": 0.7, "zorder": 2}
+            )
+            self.scatter_kwargs_test = kwargs.get(
+                "scatter_kwargs_test", {"marker": "x", "alpha": 0.7, "zorder": 2}
+            )
+        elif subclass == "ForecastingAnimation":
+            pass
+        elif subclass == "ClusteringAnimation":
+            self.scatter_kwargs = kwargs.get(
+                "scatter_kwargs", {"alpha": 0.7, "edgecolors": "k", "zorder": 2}
+            )
+            self.scatter_kwargs_test = kwargs.get(
+                "scatter_kwargs_test", {"alpha": 0.3, "marker": "x", "zorder": 2}
+            )
+
+        # Regression-specific defaults
+        self.line_kwargs = kwargs.get("line_kwargs", {"color": "red", "zorder": 3})
+
+        # Classification-specific defaults
+        self.decision_boundary_kwargs = kwargs.get(
+            "decision_boundary_kwargs", {"alpha": 0.25, "cmap": "coolwarm", "zorder": 1}
+        )
+        self.decision_boundary_line_kwargs = kwargs.get(
+            "decision_boundary_line_kwargs", {"linewidths": 1, "colors": "black"}
+        )
+
+        # Forecasting-specific defaults
+        self.train_line_kwargs = kwargs.get(
+            "train_line_kwargs", {"color": "blue", "label": "Training Data"}
+        )
+        self.vline_kwargs = kwargs.get(
+            "vline_kwargs",
+            {"color": "black", "linestyle": "--", "label": "Forecast Start"},
+        )
+        self.fitted_line_kwargs = kwargs.get(
+            "fitted_line_kwargs",
+            {"color": "green", "zorder": 3, "label": "Fitted Line"},
+        )
+        self.forecast_line_kwargs = kwargs.get(
+            "forecast_line_kwargs",
+            {"color": "red", "linestyle": "--", "zorder": 3, "label": "Forecast"},
+        )
+
+        # Clustering-specific defaults
+        self.cluster_gray_train_kwargs = kwargs.get(
+            "cluster_gray_train_kwargs",
+            {"c": "gray", "alpha": 0.5, "edgecolors": "w", "s": 50},
+        )
+        self.cluster_gray_test_kwargs = kwargs.get(
+            "cluster_gray_test_kwargs",
+            {"c": "lightgray", "alpha": 0.5, "s": 50, "marker": "x"},
+        )
+        self.cluster_center_kwargs = kwargs.get(
+            "cluster_center_kwargs",
+            {
+                "marker": "*",
+                "s": 300,
+                "edgecolors": "black",
+                "label": "Centers",
+                "zorder": 3,
+            },
+        )
+        self.prev_center_kwargs = kwargs.get(
+            "prev_center_kwargs",
+            {"marker": "*", "c": "yellow", "edgecolors": "gray", "s": 100, "zorder": 1},
+        )
+        self.trace_line_kwargs = kwargs.get(
+            "trace_line_kwargs",
+            {"linestyle": "--", "linewidth": 2.5, "alpha": 1, "zorder": 2},
+        )
+
+        # Metric plot customization options
+        self.metric_title_kwargs = kwargs.get("metric_title_kwargs", {})
+        self.metric_line_kwargs = kwargs.get("metric_line_kwargs", {})
+        self.metric_ax_kwargs = kwargs.get("metric_ax_kwargs", {})
+        self.metric_xlabel_kwargs = kwargs.get("metric_xlabel_kwargs", {})
+        self.metric_ylabel_kwargs = kwargs.get("metric_ylabel_kwargs", {})
+        self.metric_annotation_kwargs = kwargs.get("metric_annotation_kwargs", {})
+
     def setup_plot(
         self, title, xlabel, ylabel, legend_loc="upper left", grid=True, figsize=(12, 6)
     ):
@@ -118,10 +221,11 @@ class AnimationBase(ABC):
         """
         if not self.plot_metric_progression:
             self.fig, self.ax = plt.subplots(figsize=figsize)
-            self.ax.set_title(title)
-            self.fig.suptitle(title)
-            self.ax.set_xlabel(xlabel)
-            self.ax.set_ylabel(ylabel)
+            self.ax.set_title(title, **self.title_kwargs)
+            self.fig.suptitle(title, **self.suptitle_kwargs)
+            self.ax.set_xlabel(xlabel, **self.xlabel_kwargs)
+            self.ax.set_ylabel(ylabel, **self.ylabel_kwargs)
+            self.ax.grid(grid, **self.grid_kwargs)
             self.metric_axes = None
             self.metric_lines = None
         else:
@@ -152,23 +256,26 @@ class AnimationBase(ABC):
                     if self.metric_fn
                     else f"Metric {i + 1}",
                     fontsize=9,
+                    **self.metric_title_kwargs,
                 )
-                metric_ax.set_xlabel("")
-                metric_ax.set_ylabel("Metric Value", fontsize=8)
+                metric_ax.set_xlabel("", **self.metric_xlabel_kwargs)
+                metric_ax.set_ylabel(
+                    "Metric Value", fontsize=8, **self.metric_ylabel_kwargs
+                )
                 metric_ax.tick_params(axis="both", which="major", labelsize=8)
                 self.metric_axes.append(metric_ax)
                 self.metric_lines.append(metric_line)
-                self.ax.set_title(f"{self.dynamic_parameter}=")
-            self.fig.suptitle(title)
+                self.ax.set_title(f"{self.dynamic_parameter}=", **self.title_kwargs)
+            self.fig.suptitle(title, **self.suptitle_kwargs)
         if legend_loc is not None:
             # self.ax.legend(loc=legend_loc)
             # Will call legend() in update_plot() to update the legend
             self.add_legend = True
         else:
             self.add_legend = False
-        self.ax.set_xlabel(xlabel)
-        self.ax.set_ylabel(ylabel)
-        self.ax.grid(grid)
+        self.ax.set_xlabel(xlabel, **self.xlabel_kwargs)
+        self.ax.set_ylabel(ylabel, **self.ylabel_kwargs)
+        self.ax.grid(grid, **self.grid_kwargs)
         plt.tight_layout()
 
     def update_metric_plot(self, frame):
@@ -214,6 +321,7 @@ class AnimationBase(ABC):
                             "lw": 1.2,
                             "alpha": 1.0,
                         },
+                        **self.metric_annotation_kwargs,
                     )
                     metric_ax._current_metric_annotation = annotation
                 else:

@@ -87,6 +87,66 @@ class MockPredictor:
 class TestforecastingAnimation(BaseTest):
     """Unit test for the forecastingAnimation class."""
 
+    def test_set_kwargs_forecasting_and_general(self):
+        """Test that _set_kwargs sets Forecasting and General kwargs correctly."""
+        animator = ForecastingAnimation(
+            model=ExponentialMovingAverage,
+            train_series=self.train_series,
+            test_series=self.test_series,
+            forecast_steps=self.forecast_steps,
+            dynamic_parameter="alpha",
+        )
+        # Custom kwargs for forecasting and general
+        custom_kwargs = {
+            "ax_kwargs": {"fontsize": 24},
+            "legend_kwargs": {"fontsize": 18},
+            "title_kwargs": {"fontsize": 21},
+            "xlabel_kwargs": {"fontsize": 14},
+            "ylabel_kwargs": {"fontsize": 14},
+            "grid_kwargs": {"alpha": 0.5},
+            "train_line_kwargs": {"color": "navy", "label": "Train", "zorder": 2},
+            "vline_kwargs": {
+                "color": "gray",
+                "linestyle": ":",
+                "label": "Split",
+                "zorder": 1,
+            },
+            "fitted_line_kwargs": {"color": "lime", "zorder": 5, "label": "Fit"},
+            "forecast_line_kwargs": {
+                "color": "orange",
+                "linestyle": "-.",
+                "zorder": 6,
+                "label": "Forecasted",
+            },
+        }
+        animator._set_kwargs(**custom_kwargs, subclass="ForecastingAnimation")
+        # General kwargs
+        self.assertEqual(animator.ax_kwargs["fontsize"], 24)
+        self.assertEqual(animator.legend_kwargs["fontsize"], 18)
+        self.assertEqual(animator.title_kwargs["fontsize"], 21)
+        self.assertEqual(animator.xlabel_kwargs["fontsize"], 14)
+        self.assertEqual(animator.ylabel_kwargs["fontsize"], 14)
+        self.assertEqual(animator.grid_kwargs["alpha"], 0.5)
+        # Forecasting-specific kwargs
+        self.assertEqual(animator.train_line_kwargs["color"], "navy")
+        self.assertEqual(animator.train_line_kwargs["label"], "Train")
+        self.assertEqual(animator.train_line_kwargs["zorder"], 2)
+        self.assertEqual(animator.vline_kwargs["color"], "gray")
+        self.assertEqual(animator.vline_kwargs["linestyle"], ":")
+        self.assertEqual(animator.vline_kwargs["label"], "Split")
+        self.assertEqual(animator.vline_kwargs["zorder"], 1)
+        self.assertEqual(animator.fitted_line_kwargs["color"], "lime")
+        self.assertEqual(animator.fitted_line_kwargs["zorder"], 5)
+        self.assertEqual(animator.fitted_line_kwargs["label"], "Fit")
+        self.assertEqual(animator.forecast_line_kwargs["color"], "orange")
+        self.assertEqual(animator.forecast_line_kwargs["linestyle"], "-.")
+        self.assertEqual(animator.forecast_line_kwargs["zorder"], 6)
+        self.assertEqual(animator.forecast_line_kwargs["label"], "Forecasted")
+        # Defaults for unset forecasting-specific kwargs
+        self.assertIn("line_kwargs", vars(animator))
+        self.assertIn("cluster_gray_train_kwargs", vars(animator))
+        plt.close("all")
+
     @classmethod
     def setUpClass(cls):  # NOQA D201
         """Initializes the test suite."""

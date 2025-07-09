@@ -50,6 +50,7 @@ class ForecastingAnimation(AnimationBase):
             max_metric_subplots=max_metric_subplots,
             **kwargs,
         )
+        self._set_kwargs(**kwargs, subclass="ForecastingAnimation")
         self.forecast_steps = forecast_steps
         if self.keep_previous:
             self.previous_forecast_lines = []  # List to store previous forecast lines
@@ -70,24 +71,13 @@ class ForecastingAnimation(AnimationBase):
         """Set up the plot for forecasting animation."""
         super().setup_plot(title, xlabel, ylabel, legend_loc, grid, figsize)
 
-        # Plot static elements
-        self.ax.plot(
-            self.train_indices, self.train_data, label="Training Data", color="blue"
-        )
-        self.ax.axvline(
-            x=len(self.train_data),
-            color="black",
-            linestyle="--",
-            label="Forecast Start",
-        )
+        # Plot static elements using defaults
+        self.ax.plot(self.train_indices, self.train_data, **self.train_line_kwargs)
+        self.ax.axvline(x=len(self.train_data), **self.vline_kwargs)
 
-        # Create placeholders for dynamic lines, with higher zorder
-        (self.fitted_line,) = self.ax.plot(
-            [], [], label="Fitted Values", color="green", zorder=3
-        )
-        (self.forecast_line,) = self.ax.plot(
-            [], [], label="Forecast", linestyle="--", color="red", zorder=3
-        )
+        # Create placeholders for dynamic lines, with higher zorder and style
+        (self.fitted_line,) = self.ax.plot([], [], **self.fitted_line_kwargs)
+        (self.forecast_line,) = self.ax.plot([], [], **self.forecast_line_kwargs)
 
         # Auto-adjust y-limits based on the training data range
         min_y = min(self.train_data) - 0.5 * (
@@ -100,7 +90,7 @@ class ForecastingAnimation(AnimationBase):
 
         if self.add_legend:
             # Add legend to the plot
-            self.ax.legend(loc=legend_loc)
+            self.ax.legend(loc=legend_loc, **self.legend_kwargs)
 
     def update_model(self, frame):
         """Update the model for the current frame.
@@ -200,9 +190,7 @@ class ForecastingAnimation(AnimationBase):
                 line.set_alpha(0.1 + (0.4 / len(self.previous_fitted_lines)) * i)
                 line.set_color("lightgreen")
 
-            (self.fitted_line,) = self.ax.plot(
-                [], [], label="Fitted Values", color="green"
-            )
+            (self.fitted_line,) = self.ax.plot([], [], **self.fitted_line_kwargs)
 
         # Update the dynamic lines with the latest fitted and forecasted values
         self.fitted_line.set_data(self.train_indices, self.fitted_values)
@@ -231,16 +219,21 @@ class ForecastingAnimation(AnimationBase):
                 self.plot_metric_progression
                 and getattr(self, "metric_lines", None) is not None
             ):
-                self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
+                self.ax.set_title(
+                    f"{self.dynamic_parameter}={frame_rounded}", **self.title_kwargs
+                )
             else:
                 self.ax.set_title(
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
-                    fontsize=10,
+                    **self.title_kwargs,
                 )
             print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:
             frame_rounded = round(frame, 2) if isinstance(frame, float) else frame
-            self.ax.set_title(f"Forecast ({self.dynamic_parameter}={frame_rounded})")
+            self.ax.set_title(
+                f"Forecast ({self.dynamic_parameter}={frame_rounded})",
+                **self.title_kwargs,
+            )
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting
