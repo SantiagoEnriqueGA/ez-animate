@@ -8,9 +8,9 @@
   </a>
   <a href="https://pypi.org/project/ez-animate/">
     <img src="https://img.shields.io/pypi/v/ez-animate.svg" alt="PyPI Version">
-<!--   <a href="https://pepy.tech/project/ez-animate">
+  <a href="https://pepy.tech/project/ez-animate">
     <img src="https://static.pepy.tech/badge/ez-animate" alt="Downloads">
-  </a> -->
+  </a>
   </a>
   <a href="https://pypi.org/project/ez-animate/">
     <img src="https://img.shields.io/pypi/pyversions/ez-animate.svg" alt="Python Versions">
@@ -41,13 +41,13 @@ A high-level, declarative Python package for creating common Matplotlib animatio
 - **Repetitive Code:** Reduces boilerplate for standard animations.
 
 ### Who is it for?
-- **Primary:** Data scientists & analysts (exploratory analysis, presentations, notebooks)
-- **Secondary:** Students, educators, and researchers (learning, teaching, publications)
+- **Primary:** Data scientists & analysts (exploratory analysis, presentations, notebooks).
+- **Secondary:** Students, educators, and researchers (learning, teaching, publications).
 
 ## Features
-- **Simple API:** Create animations with a few lines of code
-- **Tested & Linted:** High code quality with `pytest` and `ruff`
-- **Documentation:** Built with MkDocs (**TBD**)
+- **Simple API:** Create animations with a few lines of code.
+- **Tested & Linted:** High code quality with `pytest` and `ruff`.
+- **Documentation:** See [documentation](https://santiagoenriquega.github.io/ez-animate/) for usage examples and API references.
 
 ## Installation
 
@@ -117,14 +117,18 @@ ez-animate/
 
 This project is licensed under the terms of the [MIT License](LICENSE).
 
-## Dependency Management
-
-- All dependencies are in `pyproject.toml`.
-- Core: `[project.dependencies]`
-- Other: `[project.optional-dependencies]`
-- Use `uv pip install -e .[dev]` to install all dev tools.
 
 ## Acknowledgments
 
 - Built with inspiration from the Matplotlib community.
 - Thanks to all contributors!
+
+## Example GIFs
+
+### Stochastic Gradient Descent (SGD) Regression
+Here's an example of a Stochastic Gradient Descent (SGD) regression animation created using `ez-animate`. This animation shows how the fit and the metrics evolve over time as the model learns from the data.
+![SGD Regression Animation](https://raw.githubusercontent.com/SantiagoEnriqueGA/ez-animate/master/docs/plots/animator_sgd.gif)
+
+### K-Means Clustering
+Here's an example of a K-Means clustering animation created using `ez-animate`. This animation shows how the cluster centroids and the data points evolve over time as the algorithm iteratively refines the clusters.
+![K-Means Clustering Animation](https://raw.githubusercontent.com/SantiagoEnriqueGA/ez-animate/master/docs/plots/animator_kmeans.gif)
