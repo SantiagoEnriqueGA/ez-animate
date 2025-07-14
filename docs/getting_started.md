@@ -1,9 +1,7 @@
 # Getting Started
 
 ## Installation
-
-> **Note:** PyPI release is pending. For now, install directly from GitHub.
-
+To get started with `ez-animate`, you can install it via pip:
 ```bash
 pip install ez-animate
 ```
