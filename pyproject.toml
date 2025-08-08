@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ez-animate"
-version = "0.1.0"
+version = "0.1.1"
 description = "A simple package to streamline Matplotlib animations."
 authors = [
     {name = "Santiago Gonzalez", email = "sega97@gmail.com"},
