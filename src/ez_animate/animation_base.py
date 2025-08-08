@@ -141,6 +141,15 @@ class AnimationBase(ABC):
             self.scatter_kwargs_test = kwargs.get(
                 "scatter_kwargs_test", {"alpha": 0.3, "marker": "x", "zorder": 2}
             )
+        elif subclass == "TransformationAnimation":
+            # Defaults for transformation visualizations
+            self.scatter_kwargs = kwargs.get(
+                "scatter_kwargs", {"color": "blue", "alpha": 0.6, "zorder": 2}
+            )
+            self.scatter_kwargs_test = kwargs.get(
+                "scatter_kwargs_test",
+                {"color": "orange", "alpha": 0.7, "marker": "x", "zorder": 2},
+            )
 
         # Regression-specific defaults
         self.line_kwargs = kwargs.get("line_kwargs", {"color": "red", "zorder": 3})

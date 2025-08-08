@@ -805,6 +805,31 @@ class TestClusteringAnimation(BaseTest):
         self.assertGreaterEqual(len(artists), 1)
         plt.close(animator.fig)
 
+    def test_update_plot_with_metric_progression_and_lines(self):
+        """Covers return path that includes metric_lines when plot_metric_progression=True."""
+        animator = ClusteringAnimation(
+            model=KMeans,
+            data=self.X,
+            labels=self.y,
+            test_size=0.25,
+            dynamic_parameter="n_init",
+            static_parameters={"n_clusters": 3},
+            metric_fn=[silhouette_score],
+            plot_metric_progression=True,
+        )
+        # Simulate metric progression/lines (AnimationBase.update_metric_plot can handle placeholders)
+        animator.metric_progression = [[1.0]]
+        animator.metric_lines = []
+        with suppress_print():
+            animator.setup_plot("Metric Progression", "F1", "F2")
+            animator.update_model(5)
+            artists = animator.update_plot(5)
+        # Expect tuple that ends with metric_lines entry
+        self.assertIsInstance(artists, tuple)
+        self.assertGreaterEqual(len(artists), 1)
+        self.assertEqual(artists[-1], animator.metric_lines)
+        plt.close(animator.fig)
+
 
 if __name__ == "__main__":
     unittest.main()

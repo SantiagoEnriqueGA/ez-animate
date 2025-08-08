@@ -4,6 +4,7 @@ import unittest
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -378,6 +379,9 @@ class TestforecastingAnimation(BaseTest):
         )
         with suppress_print():
             animator.update_model(0.3)
+        # Ensure to_numpy branches were exercised and arrays flattened
+        self.assertIsInstance(np.asarray(animator.fitted_values), np.ndarray)
+        self.assertIsInstance(np.asarray(animator.forecast_values), np.ndarray)
 
     def test_update_plot_with_metrics(self):
         """Test update_plot with metrics."""
@@ -420,6 +424,45 @@ class TestforecastingAnimation(BaseTest):
 
         self.assertIsInstance(artists, list)
         self.assertTrue(all(isinstance(artist, plt.Line2D) for artist in artists))
+        plt.close(animator.fig)
+
+    def test_update_plot_with_metric_progression_and_lines(self):
+        """Covers return path that includes metric_lines when plot_metric_progression=True."""
+        animator = ForecastingAnimation(
+            model=ExponentialMovingAverage,
+            train_series=self.train_series,
+            test_series=self.test_series,
+            forecast_steps=self.forecast_steps,
+            dynamic_parameter="alpha",
+            metric_fn=[Metrics.mean_squared_error],
+            plot_metric_progression=True,
+        )
+        # Pre-seed metric progression and the metric_lines placeholder
+        animator.metric_progression = [[1.0]]
+        animator.metric_lines = []
+        with suppress_print():
+            animator.setup_plot("Metric Progression", "Time", "Value")
+            animator.update_model(0.3)
+            artists = animator.update_plot(0.3)
+        self.assertIsInstance(artists, list)
+        self.assertGreaterEqual(len(artists), 3)
+        self.assertEqual(artists[-1], animator.metric_lines)
+        plt.close(animator.fig)
+
+    def test_update_plot_title_without_metrics_float_frame(self):
+        """Covers else branch for title when metric_fn is None and frame is float (rounded)."""
+        animator = ForecastingAnimation(
+            model=ExponentialMovingAverage,
+            train_series=self.train_series,
+            test_series=self.test_series,
+            forecast_steps=self.forecast_steps,
+            dynamic_parameter="alpha",
+        )
+        with suppress_print():
+            animator.setup_plot("No Metrics", "Time", "Value")
+            animator.update_model(0.25)
+            _artists = animator.update_plot(0.25)
+        self.assertIn("Forecast (alpha=0.25)", animator.ax.get_title())
         plt.close(animator.fig)
 
 
