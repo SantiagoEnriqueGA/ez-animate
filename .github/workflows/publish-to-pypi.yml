@@ -91,7 +91,8 @@ jobs:
         run: |
           uv publish dist/* \
             --publish-url https://upload.pypi.org/legacy/ \
-            --token ${{ secrets.PYPI_API_TOKEN }}
+            --token ${{ secrets.PYPI_API_TOKEN }} \
+            --skip-existing
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
