@@ -1,7 +1,7 @@
 # API Reference
 
 ## Animation Classes
-This section describes the main animation classes provided by `ez-animate`. Each class is designed to create specific types of animations for different use cases, such as regression, classification, and forecasting.
+This section describes the main animation classes provided by `ez-animate`. Each class is designed to create specific types of animations for different use cases, such as regression, classification, clustering, forecasting, and data transformation.
 
 ### RegressionAnimation
 
@@ -181,6 +181,42 @@ ForecastingAnimation(
 - `**kwargs`: Additional keyword arguments for plot customization. See the "Customization with **kwargs**" section for details.
 
 
+### TransformationAnimation
+
+Creates Matplotlib animations for data transformation steps (e.g., scaling, normalization, PCA).
+
+- Inherits from `AnimationBase`.
+- Accepts a transformer class and input data `X`.
+- Supports dynamic/static parameters, optional metric tracking, and plot customization.
+- Returns a Matplotlib `FuncAnimation` object for display or saving.
+
+**Constructor:**
+```python
+TransformationAnimation(
+  transformer,
+  X,
+  dynamic_parameter,
+  static_parameters=None,
+  keep_previous=False,
+  metric_fn=None,
+  plot_metric_progression=None,
+  max_metric_subplots=1,
+  **kwargs,
+)
+```
+
+#### Parameters:
+- `transformer`: Transformer class (e.g., `StandardScaler`, `MinMaxScaler`, `PCA`).
+- `X`: Input data array (2D array-like).
+- `dynamic_parameter`: Name of the transformer parameter to vary dynamically over frames (e.g., `n_components`, `feature_range`). Required.
+- `static_parameters`: Dictionary of static parameters for the transformer (default: `None`).
+- `keep_previous`: Whether to keep and display previous transformed states (default: `False`).
+- `metric_fn`: Optional metric function or list of functions to calculate and display during animation. Each function should accept `(X_original, X_transformed)` and return a numeric value (e.g., reconstruction error, average distance).
+- `plot_metric_progression`: Whether to plot the progression of the metric(s) over time.
+- `max_metric_subplots`: Maximum number of subplots to show for metric progression (if multiple metrics).
+- `**kwargs`: Additional keyword arguments for plot customization. See the "Customization with **kwargs**" section for details.
+
+
 ## Common Methods
 
 All animation classes inherit the following methods:
@@ -300,3 +336,9 @@ The following `kwargs` are used with specific animation classes. They customize 
   - Example: `fitted_line_kwargs={'color': 'orange', 'zorder': 4}`
 - `forecast_line_kwargs`: Customizes the line for the forecasted values.
   - Example: `forecast_line_kwargs={'color': 'purple', 'marker': 'o'}`
+
+#### TransformationAnimation
+- `scatter_kwargs`: Customizes the scatter plot for the original input data points.
+  - Example: `scatter_kwargs={'color': 'blue', 'alpha': 0.6}`
+- `scatter_kwargs_test`: Customizes the scatter plot for the transformed data points.
+  - Example: `scatter_kwargs_test={'color': 'orange', 'alpha': 0.7, 'marker': 'x'}`
