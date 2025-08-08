@@ -53,12 +53,15 @@ class TestTransformationAnimation(BaseTest):
             TransformationAnimation(
                 transformer=StandardScaler, X=None, dynamic_parameter="with_mean"
             )
+
         # transformer without fit
         class NoFit:
             pass
 
         with self.assertRaises(ValueError):
-            TransformationAnimation(transformer=NoFit(), X=self.X, dynamic_parameter="p")
+            TransformationAnimation(
+                transformer=NoFit(), X=self.X, dynamic_parameter="p"
+            )
         with self.assertRaises(ValueError):
             TransformationAnimation(
                 transformer=StandardScaler, X=self.X, dynamic_parameter=123

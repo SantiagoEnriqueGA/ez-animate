@@ -390,6 +390,7 @@ class TestFuncs(BaseTest):
         self.assertIsInstance(X_train, np.ndarray)
         self.assertIsInstance(X_test, np.ndarray)
 
+
 class TestUtilsOther(unittest.TestCase):
     """Extra tests to increase coverage of utils.train_test_split branches."""
 
@@ -463,6 +464,7 @@ class TestUtilsOther(unittest.TestCase):
         self.assertEqual(X_train.shape[0] + X_test.shape[0], 10)
         self.assertEqual(X_train.shape[1], 2)
         self.assertEqual(X_test.shape[1], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

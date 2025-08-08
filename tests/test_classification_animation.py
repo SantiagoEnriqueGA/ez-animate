@@ -247,6 +247,7 @@ class TestClassificationAnimation(BaseTest):
 
     def test_update_plot_metric_progression_title(self):
         """Covers title branch when plot_metric_progression=True (no metrics in title)."""
+
         class DummyMetric:
             __name__ = "dummy"
 
@@ -273,6 +274,7 @@ class TestClassificationAnimation(BaseTest):
 
     def test_update_plot_metric_progression_without_metric_lines(self):
         """When plot_metric_progression=True but metric_lines is None, title should include metrics."""
+
         class DummyMetric:
             __name__ = "accuracy"
 
