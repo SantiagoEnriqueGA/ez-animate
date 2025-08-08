@@ -143,3 +143,30 @@ convention = "google" # <- Using Google style guide for docstrings (not "numpy" 
 # [tool.ruff.lint.per-file-ignores]
 
 [tool.ruff.format]
+
+# Limit what goes into distributions to avoid huge sdists
+[tool.hatch.build.targets.wheel]
+# Ensure only the package under src is included in the wheel
+packages = ["src/ez_animate"]
+exclude = [
+    "**/__pycache__/**",
+    "**/*.py[cod]",
+]
+
+[tool.hatch.build.targets.sdist]
+# Keep the sdist lean to stay well under PyPI's 100 MB limit
+# Include only essential files and the package source
+include = [
+    "src",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
+exclude = [
+    "**/__pycache__/**",
+    "**/*.py[cod]",
+    "**/*.gif",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.svg",
+]
