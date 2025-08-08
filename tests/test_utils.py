@@ -390,6 +390,79 @@ class TestFuncs(BaseTest):
         self.assertIsInstance(X_train, np.ndarray)
         self.assertIsInstance(X_test, np.ndarray)
 
+class TestUtilsOther(unittest.TestCase):
+    """Extra tests to increase coverage of utils.train_test_split branches."""
+
+    def test_stratify_wrong_length_raises(self):
+        """Stratify labels of wrong length should raise ValueError."""
+        X = np.arange(10).reshape(5, 2)
+        y = np.arange(5)
+        stratify = np.arange(4)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, stratify=stratify)
+
+    def test_test_size_float_out_of_bounds(self):
+        """Float test_size outside [0,1] should raise ValueError."""
+        X = np.arange(10).reshape(5, 2)
+        y = np.arange(5)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, test_size=-0.1)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, test_size=1.1)
+
+    def test_test_size_int_out_of_bounds(self):
+        """Integer test_size outside [0,n] should raise ValueError."""
+        X = np.arange(10).reshape(5, 2)
+        y = np.arange(5)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, test_size=-1)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, test_size=6)
+
+    def test_stratified_rounding_adjustment(self):
+        """Rounding adjustment in stratified split preserves sizes."""
+        X = np.arange(40).reshape(20, 2)
+        y = np.array([0] * 13 + [1] * 7)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.35, stratify=y, random_state=42
+        )
+        self.assertEqual(len(X_train), 13)
+        self.assertEqual(len(X_test), 7)
+        # Proportions roughly preserved
+        self.assertAlmostEqual(sum(y_train) / len(y_train), sum(y) / len(y), delta=0.15)
+
+    def test_pandas_dataframe_and_series_split(self):
+        """Pandas DataFrame/Series splitting hits iloc path."""
+        X = pd.DataFrame({"a": range(10), "b": range(10, 20)})
+        y = pd.Series(range(10))
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=0
+        )
+        self.assertEqual(len(X_train) + len(X_test), 10)
+        self.assertTrue(hasattr(X_train, "iloc"))
+        self.assertTrue(hasattr(y_train, "iloc"))
+
+    def test_numpy_array_split_branch(self):
+        """NumPy ndarray branch should preserve ndarray types."""
+        X = np.arange(20).reshape(10, 2)
+        y = np.arange(10)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.3, random_state=0
+        )
+        self.assertEqual(X_train.shape[0] + X_test.shape[0], 10)
+        self.assertIsInstance(X_train, np.ndarray)
+        self.assertIsInstance(X_test, np.ndarray)
+
+    def test_sparse_matrix_split_branch(self):
+        """Sparse csr_matrix branch should index correctly and preserve shape."""
+        X = csr_matrix(np.arange(20).reshape(10, 2))
+        y = np.arange(10)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=123
+        )
+        self.assertEqual(X_train.shape[0] + X_test.shape[0], 10)
+        self.assertEqual(X_train.shape[1], 2)
+        self.assertEqual(X_test.shape[1], 2)
 
 if __name__ == "__main__":
     unittest.main()

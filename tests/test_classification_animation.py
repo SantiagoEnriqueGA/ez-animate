@@ -245,6 +245,58 @@ class TestClassificationAnimation(BaseTest):
         self.assertIsInstance(result, tuple)
         self.assertEqual(len(result), 3)
 
+    def test_update_plot_metric_progression_title(self):
+        """Covers title branch when plot_metric_progression=True (no metrics in title)."""
+        class DummyMetric:
+            __name__ = "dummy"
+
+            def __call__(self, y_true, y_pred):
+                return 1.0
+
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            metric_fn=[DummyMetric()],
+            plot_metric_progression=True,
+        )
+        # Seed metric progression and metric_lines so the branch is taken
+        animator.metric_progression = [[1.0]]
+        animator.metric_lines = []
+        animator.setup_plot("Title Branch", "F1", "F2")
+        animator.update_model(50)
+        with suppress_print():
+            _ = animator.update_plot(50)
+        self.assertEqual(animator.ax.get_title(), "max_iter=50")
+
+    def test_update_plot_metric_progression_without_metric_lines(self):
+        """When plot_metric_progression=True but metric_lines is None, title should include metrics."""
+        class DummyMetric:
+            __name__ = "accuracy"
+
+            def __call__(self, y_true, y_pred):
+                return 0.9
+
+        animator = ClassificationAnimation(
+            model=LogisticRegression,
+            X=self.X,
+            y=self.y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            metric_fn=[DummyMetric()],
+            plot_metric_progression=True,
+        )
+        animator.setup_plot("Progression", "F1", "F2")
+        # Ensure metric_lines is None so the else-branch is taken; leave metric_progression as None
+        animator.metric_lines = None
+        animator.update_model(25)
+        with suppress_print():
+            _ = animator.update_plot(25)
+        # Should include metric in title since metric_lines is None
+        self.assertIn("Accuracy", animator.ax.get_title())
+
     @classmethod
     def setUpClass(cls):  # NOQA D201
         """Initializes the test suite."""

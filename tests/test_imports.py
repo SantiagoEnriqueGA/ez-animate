@@ -42,6 +42,7 @@ class TestImports(BaseTest):
             "RegressionAnimation",
             "ClassificationAnimation",
             "ClusteringAnimation",
+            "TransformationAnimation",
             "PCA",
             "train_test_split",
         ]

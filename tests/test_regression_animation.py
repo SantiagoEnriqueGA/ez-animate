@@ -486,6 +486,35 @@ class TestRegressionAnimation(BaseTest):
         self.assertIsInstance(artists[0], plt.Line2D)
         plt.close(animator.fig)
 
+    def test_setup_plot_xlabel_fallback_and_metric_progression_title(self):
+        """Covers xlabel fallback when X has >1 features and plot_metric_progression title path."""
+        # Create data with 2 features (no PCA requested) to trigger fallback path
+        X = np.random.rand(120, 2)
+        y = np.random.rand(120)
+        animator = RegressionAnimation(
+            model=Ridge,
+            X=X,
+            y=y,
+            test_size=0.25,
+            dynamic_parameter="max_iter",
+            pca_components=2,
+            metric_fn=[Metrics.mean_squared_error],
+            plot_metric_progression=True,
+        )
+        with suppress_print():
+            animator.setup_plot("Fallback", "X", "y")
+            self.assertEqual(animator.ax.get_xlabel(), "Feature 1")
+            animator.update_model(10)
+            animator.metric_progression = [[0.0]]
+            # Simulate metric lines existing for blitting
+            from matplotlib.lines import Line2D
+
+            animator.metric_lines = [Line2D([], [])]
+            _artists = animator.update_plot(10)
+        # Title should contain only the dynamic parameter when plot_metric_progression=True
+        self.assertEqual(animator.ax.get_title(), "max_iter=10")
+        plt.close(animator.fig)
+
 
 if __name__ == "__main__":
     unittest.main()
