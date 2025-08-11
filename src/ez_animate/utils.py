@@ -1,15 +1,20 @@
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
+from numpy.typing import NDArray
 from scipy import sparse
 
 
 def train_test_split(
-    *arrays,
-    test_size=None,
-    train_size=None,
-    random_state=None,
-    shuffle=True,
-    stratify=None,
-):
+    *arrays: Any,
+    test_size: float | int | None = None,
+    train_size: float | int | None = None,
+    random_state: int | None = None,
+    shuffle: bool = True,
+    stratify: Any = None,
+) -> list[Any]:
     """Splits arrays or matrices into random train and test subsets.
 
     Args:
@@ -178,7 +183,7 @@ def train_test_split(
         test_indices = indices[n_train : n_train + n_test]
 
     # Split the arrays while preserving their type (especially for numpy arrays)
-    result = []
+    result: list[Any] = []
     for array in arrays:
         if sparse.issparse(array):
             train = array[train_indices]
@@ -204,17 +209,23 @@ def train_test_split(
 class PCA:
     """Principal Component Analysis (PCA) implementation."""
 
-    def __init__(self, n_components):
+    def __init__(self, n_components: int) -> None:
         """Initializes the PCA model.
 
         Args:
             n_components: (int) - Number of principal components to keep.
         """
-        self.n_components = n_components
-        self.components = None
-        self.mean_ = None
+        self.n_components: int = n_components
+        # Attributes set during fitting
+        self.components_: NDArray[np.floating] | None = None
+        self.components: NDArray[np.floating] | None = (
+            None  # kept for potential backward compatibility
+        )
+        self.mean_: NDArray[np.floating] | None = None
+        self.explained_variance_: NDArray[np.floating] | None = None
+        self.explained_variance_ratio_: NDArray[np.floating] | None = None
 
-    def fit(self, X):
+    def fit(self, X: NDArray[Any]) -> None:
         """Fits the PCA model to the data.
 
         Args:
@@ -236,22 +247,32 @@ class PCA:
         self.mean_ = np.mean(X, axis=0)
         X = X - self.mean_
 
-        # Covariance matrix
-        cov = np.cov(X.T)
+        # Covariance matrix (features as columns)
+        cov = np.cov(X, rowvar=False)
 
-        # Eigenvalues and eigenvectors
-        eigenvalues, eigenvectors = np.linalg.eig(cov)
+        # Eigenvalues and eigenvectors for symmetric matrix
+        eigenvalues, eigenvectors = np.linalg.eigh(cov)
 
-        # Sort eigenvectors by eigenvalues in descending order
-        eigenvectors = eigenvectors[:, np.argsort(eigenvalues)[::-1]]
+        # Sort eigenpairs by eigenvalues in descending order
+        idx = np.argsort(eigenvalues)[::-1]
+        eigenvalues_sorted = eigenvalues[idx]
+        eigenvectors_sorted = eigenvectors[:, idx]
 
         # Select the top n_components eigenvectors
-        self.components_ = eigenvectors[:, : self.n_components]
-        self.explained_variance_ratio_ = eigenvalues[: self.n_components] / np.sum(
-            eigenvalues
+        self.components_ = eigenvectors_sorted[:, : self.n_components]
+        self.components = self.components_
+
+        # Explained variance and ratio based on sorted eigenvalues
+        self.explained_variance_ = eigenvalues_sorted[: self.n_components]
+        total_variance = np.sum(eigenvalues_sorted)
+        # Avoid division by zero in degenerate cases
+        self.explained_variance_ratio_ = (
+            self.explained_variance_ / total_variance
+            if total_variance > 0
+            else np.zeros_like(self.explained_variance_)
         )
 
-    def transform(self, X):
+    def transform(self, X: NDArray[Any]) -> NDArray[Any]:
         """Applies dimensionality reduction on the input data.
 
         Args:
@@ -267,6 +288,8 @@ class PCA:
             raise ValueError("Input data must be a numpy array.")
         if X.ndim != 2:
             raise ValueError("Input data must be a 2D array.")
+        if self.mean_ is None:
+            raise ValueError("PCA instance is not fitted. Call fit before transform.")
         if X.shape[1] != self.mean_.shape[0]:
             raise ValueError(
                 "Input data must have the same number of features as the data used to fit the model."
@@ -274,9 +297,13 @@ class PCA:
 
         # Project data to the principal component space
         X = X - self.mean_
+        if self.components_ is None:
+            raise ValueError(
+                "PCA instance is not fitted. Components are not available."
+            )
         return np.dot(X, self.components_)
 
-    def fit_transform(self, X):
+    def fit_transform(self, X: NDArray[Any]) -> NDArray[Any]:
         """Fits the PCA model and applies dimensionality reduction on the input data.
 
         Args:
@@ -288,23 +315,31 @@ class PCA:
         self.fit(X)
         return self.transform(X)
 
-    def get_explained_variance_ratio(self):
+    def get_explained_variance_ratio(self) -> NDArray[Any]:
         """Retrieves the explained variance ratio.
 
         Returns:
             explained_variance_ratio_: (np.ndarray) - Array of explained variance ratios for each principal component.
         """
+        if self.explained_variance_ratio_ is None:
+            raise ValueError(
+                "PCA instance is not fitted. Explained variance ratio is not available."
+            )
         return self.explained_variance_ratio_
 
-    def get_components(self):
+    def get_components(self) -> NDArray[Any]:
         """Retrieves the principal components.
 
         Returns:
             components_: (np.ndarray) - Array of principal components of shape (n_features, n_components).
         """
+        if self.components_ is None:
+            raise ValueError(
+                "PCA instance is not fitted. Components are not available."
+            )
         return self.components_
 
-    def inverse_transform(self, X_reduced):
+    def inverse_transform(self, X_reduced: NDArray[Any]) -> NDArray[Any]:
         """Reconstructs the original data from the reduced data.
 
         Args:
@@ -320,4 +355,8 @@ class PCA:
             raise ValueError("Input data must be a numpy array.")
         if X_reduced.ndim != 2:
             raise ValueError("Input data must be a 2D array.")
+        if self.components_ is None or self.mean_ is None:
+            raise ValueError(
+                "PCA instance is not fitted. Components/mean are not available."
+            )
         return np.dot(X_reduced, self.components_.T) + self.mean_

@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
 
 from .animation_base import AnimationBase
@@ -9,20 +14,20 @@ class RegressionAnimation(AnimationBase):
 
     def __init__(
         self,
-        model,
-        X,
-        y,
-        test_size=0.3,
-        dynamic_parameter=None,
-        static_parameters=None,
-        keep_previous=False,
-        max_previous=None,
-        pca_components=1,
-        metric_fn=None,
-        plot_metric_progression=False,
-        max_metric_subplots=1,
-        **kwargs,
-    ):
+        model: type[Any] | Callable[..., Any],
+        X: np.ndarray,
+        y: np.ndarray,
+        test_size: float = 0.3,
+        dynamic_parameter: str | None = None,
+        static_parameters: dict[str, Any] | None = None,
+        keep_previous: bool = False,
+        max_previous: int | None = None,
+        pca_components: int = 1,
+        metric_fn: Callable[..., float] | list[Callable[..., float]] | None = None,
+        plot_metric_progression: bool = False,
+        max_metric_subplots: int = 1,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the regression animation class.
 
         Args:
@@ -116,8 +121,14 @@ class RegressionAnimation(AnimationBase):
             self.previous_predicted_lines = []  # List to store previous predicted lines
 
     def setup_plot(
-        self, title, xlabel, ylabel, legend_loc="upper left", grid=True, figsize=(12, 6)
-    ):
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        legend_loc: str | None = "upper left",
+        grid: bool = True,
+        figsize: tuple[int, int] = (12, 6),
+    ) -> None:
         """Set up the plot for regression animation."""
         # Use generic "Feature" label if PCA was applied
         if self.needs_pca and self.pca_instance.n_components == 1:
@@ -154,7 +165,7 @@ class RegressionAnimation(AnimationBase):
             # Add legend to the plot
             self.ax.legend(loc=legend_loc, **self.legend_kwargs)
 
-    def update_model(self, frame):
+    def update_model(self, frame: Any) -> None:
         """Update the regression model for the current frame.
 
         Args:
@@ -170,7 +181,7 @@ class RegressionAnimation(AnimationBase):
         self.X_test_sorted = self.X_test[sort_indices]
         self.predicted_values = self.model_instance.predict(self.X_test_sorted)
 
-    def update_plot(self, frame):
+    def update_plot(self, frame: Any) -> tuple[Any, ...] | list[Any]:
         """Update the plot for the current frame.
 
         Args:

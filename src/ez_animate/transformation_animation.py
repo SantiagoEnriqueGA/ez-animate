@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
+
 from .animation_base import AnimationBase
 
 
@@ -6,16 +11,16 @@ class TransformationAnimation(AnimationBase):
 
     def __init__(
         self,
-        transformer,
-        X,
-        dynamic_parameter=None,
-        static_parameters=None,
-        keep_previous=False,
-        metric_fn=None,
-        plot_metric_progression=None,
-        max_metric_subplots=1,
-        **kwargs,
-    ):
+        transformer: type[Any] | Callable[..., Any],
+        X: Any,
+        dynamic_parameter: str | None = None,
+        static_parameters: dict[str, Any] | None = None,
+        keep_previous: bool = False,
+        metric_fn: Callable[..., float] | list[Callable[..., float]] | None = None,
+        plot_metric_progression: bool | None = None,
+        max_metric_subplots: int = 1,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the TransformationAnimation class.
 
         Args:
@@ -62,8 +67,14 @@ class TransformationAnimation(AnimationBase):
             self.previous_transforms = []
 
     def setup_plot(
-        self, title, xlabel, ylabel, legend_loc="upper left", grid=True, figsize=(12, 6)
-    ):
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        legend_loc: str | None = "upper left",
+        grid: bool = True,
+        figsize: tuple[int, int] = (12, 6),
+    ) -> None:
         """Set up the plot for transformation animation.
 
         Args:
@@ -82,7 +93,7 @@ class TransformationAnimation(AnimationBase):
         if self.add_legend:
             self.ax.legend(loc=legend_loc)
 
-    def update_model(self, frame):
+    def update_model(self, frame: Any) -> None:
         """Update the transformer for the current frame.
 
         Args:
@@ -95,7 +106,7 @@ class TransformationAnimation(AnimationBase):
         self.transformer_instance.fit(self.X)
         self.transformed_X = self.transformer_instance.transform(self.X)
 
-    def update_plot(self, frame):
+    def update_plot(self, frame: Any) -> tuple[Any, ...] | list[Any]:
         """Update the plot for the current frame.
 
         Args:

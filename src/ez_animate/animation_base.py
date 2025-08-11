@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Iterable, Sequence
+from typing import Any
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
@@ -34,17 +38,17 @@ class AnimationBase(ABC):
 
     def __init__(
         self,
-        model,
-        train_series,
-        test_series,
-        dynamic_parameter=None,
-        static_parameters=None,
-        keep_previous=None,
-        metric_fn=None,
-        plot_metric_progression=None,
-        max_metric_subplots=1,
-        **kwargs,
-    ):
+        model: type[Any] | Callable[..., Any],
+        train_series: Any,
+        test_series: Any,
+        dynamic_parameter: str | None = None,
+        static_parameters: dict[str, Any] | None = None,
+        keep_previous: bool | None = None,
+        metric_fn: Callable[..., float] | list[Callable[..., float]] | None = None,
+        plot_metric_progression: bool | None = None,
+        max_metric_subplots: int = 1,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the animation base class.
 
         Args:
@@ -73,39 +77,42 @@ class AnimationBase(ABC):
         self.model = model
         self.train_data = train_series
         self.test_data = test_series
-        self.dynamic_parameter = dynamic_parameter  # Parameter to update dynamically
+        self.dynamic_parameter = dynamic_parameter
         self.static_parameters = (
             static_parameters if static_parameters is not None else {}
         )
-        self.keep_previous = keep_previous
+        self.keep_previous = bool(keep_previous)  # type: bool
 
         # Store additional keyword arguments
-        self.kwargs = kwargs
+        self.kwargs = kwargs  # type: dict[str, Any]
 
         # Optional metric function (e.g., MSE)
-        self.metric_fn = metric_fn
-        self.plot_metric_progression = plot_metric_progression
-        self.max_metric_subplots = max_metric_subplots if max_metric_subplots else 1
-        # If self.metric_fn is not a list, convert it to a list
-        if self.metric_fn and not isinstance(self.metric_fn, list):
-            self.metric_fn = [self.metric_fn]
+        if metric_fn is None:
+            self.metric_fn = None
+        elif isinstance(metric_fn, list):
+            self.metric_fn = metric_fn
+        else:
+            self.metric_fn = [metric_fn]
+        self.plot_metric_progression = bool(plot_metric_progression)
+        self.max_metric_subplots = max_metric_subplots if max_metric_subplots else 1  # type: int
 
         # For each metric, keep a progression list (up to max_metric_subplots)
         if self.metric_fn and self.plot_metric_progression:
-            self.metric_progression = [
+            self.metric_progression = [  # type: list[list[float]]
                 [] for _ in range(min(len(self.metric_fn), self.max_metric_subplots))
             ]
         else:
             self.metric_progression = None
 
         # Plot elements
-        self.fig, self.ax = None, None
+        self.fig = None
+        self.ax = None
         self.lines = {}
         self.title = None
-        self.metric_axes = None  # List of axes for metrics
-        self.metric_lines = None  # List of lines for metrics
+        self.metric_axes = None
+        self.metric_lines = None
 
-    def _set_kwargs(self, subclass=None, **kwargs):
+    def _set_kwargs(self, subclass: str | None = None, **kwargs: Any) -> None:
         """Set the keyword arguments for plot customization, with defaults for all animation types."""
         # General defaults
         self.ax_kwargs = kwargs.get("ax_kwargs", {"fontsize": 10})
@@ -216,8 +223,14 @@ class AnimationBase(ABC):
         self.metric_annotation_kwargs = kwargs.get("metric_annotation_kwargs", {})
 
     def setup_plot(
-        self, title, xlabel, ylabel, legend_loc="upper left", grid=True, figsize=(12, 6)
-    ):
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        legend_loc: str | None = "upper left",
+        grid: bool = True,
+        figsize: tuple[int, int] = (12, 6),
+    ) -> None:
         """Set up the plot for the animation.
 
         Args:
@@ -287,7 +300,7 @@ class AnimationBase(ABC):
         self.ax.grid(grid, **self.grid_kwargs)
         plt.tight_layout()
 
-    def update_metric_plot(self, frame):
+    def update_metric_plot(self, frame: Any) -> None:
         """Update the metric plot(s) for the current frame, and annotate with the current value of each metric in the top left corner."""
         if (
             self.metric_progression is not None
@@ -337,16 +350,22 @@ class AnimationBase(ABC):
                     metric_ax._current_metric_annotation = None
 
     @abstractmethod
-    def update_model(self, frame):
+    def update_model(self, frame: Any) -> None:
         """Abstract method to update the model for a given frame. Must be implemented by subclasses."""
         raise NotImplementedError
 
     @abstractmethod
-    def update_plot(self, frame):
+    def update_plot(self, frame: Any) -> tuple[Any, ...] | list[Any]:
         """Abstract method to update the plot for a given frame.Must be implemented by subclasses."""
         raise NotImplementedError
 
-    def animate(self, frames, interval=150, blit=False, repeat=True):
+    def animate(
+        self,
+        frames: Iterable[Any] | Sequence[Any] | int,
+        interval: int = 150,
+        blit: bool = False,
+        repeat: bool = True,
+    ) -> animation.FuncAnimation:
         """Create the animation.
 
         Args:
@@ -371,7 +390,13 @@ class AnimationBase(ABC):
 
         return self.ani
 
-    def save(self, filename, writer="pillow", fps=5, dpi=100):
+    def save(
+        self,
+        filename: str,
+        writer: str | animation.AbstractMovieWriter | None = "pillow",
+        fps: int = 5,
+        dpi: int = 100,
+    ) -> None:
         """Save the animation to a file.
 
         Args:
@@ -393,7 +418,7 @@ class AnimationBase(ABC):
             sys.stdout.write("\033[K")  # Clear the line on error too
             print(f"\nError saving animation: {e}")
 
-    def show(self):
+    def show(self) -> None:
         """Display the animation."""
         if not hasattr(self, "ani") or self.ani is None:
             raise RuntimeError("Animation has not been created. Call `animate` first.")

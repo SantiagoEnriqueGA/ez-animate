@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -10,21 +15,21 @@ class ClassificationAnimation(AnimationBase):
 
     def __init__(
         self,
-        model,
-        X,
-        y,
-        test_size=0.3,
-        dynamic_parameter=None,
-        static_parameters=None,
-        keep_previous=False,
-        scaler=None,
-        pca_components=2,
-        plot_step=0.02,
-        metric_fn=None,
-        plot_metric_progression=None,
-        max_metric_subplots=1,
-        **kwargs,
-    ):
+        model: type[Any] | Callable[..., Any],
+        X: np.ndarray,
+        y: np.ndarray,
+        test_size: float = 0.3,
+        dynamic_parameter: str | None = None,
+        static_parameters: dict[str, Any] | None = None,
+        keep_previous: bool = False,
+        scaler: Any | None = None,
+        pca_components: int = 2,
+        plot_step: float = 0.02,
+        metric_fn: Callable[..., float] | list[Callable[..., float]] | None = None,
+        plot_metric_progression: bool | None = None,
+        max_metric_subplots: int = 1,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the classification animation class.
 
         Args:
@@ -127,8 +132,14 @@ class ClassificationAnimation(AnimationBase):
             self.previous_decision_lines = []  # Store previous decision boundaries
 
     def setup_plot(
-        self, title, xlabel, ylabel, legend_loc="upper left", grid=True, figsize=(12, 6)
-    ):
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        legend_loc: str | None = "upper left",
+        grid: bool = True,
+        figsize: tuple[int, int] = (12, 6),
+    ) -> None:
         """Set up the plot for classification animation."""
         # Adjust labels if PCA was used
         effective_xlabel = f"{xlabel} (PCA Comp 1)" if self.needs_pca else xlabel
@@ -169,7 +180,7 @@ class ClassificationAnimation(AnimationBase):
         if self.add_legend:
             self.ax.legend(loc=legend_loc)
 
-    def update_model(self, frame):
+    def update_model(self, frame: Any) -> None:
         """Update the classification model for the current frame.
 
         Args:
@@ -181,7 +192,7 @@ class ClassificationAnimation(AnimationBase):
         )
         self.model_instance.fit(self.X_train, self.y_train)
 
-    def update_plot(self, frame):
+    def update_plot(self, frame: Any) -> tuple[Any, ...] | list[Any]:
         """Update the plot for the current frame.
 
         Args:

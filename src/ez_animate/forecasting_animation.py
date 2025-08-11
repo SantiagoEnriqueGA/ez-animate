@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
 
 from .animation_base import AnimationBase
@@ -8,19 +13,19 @@ class ForecastingAnimation(AnimationBase):
 
     def __init__(
         self,
-        model,
-        train_series,
-        test_series,
-        forecast_steps,
-        dynamic_parameter=None,
-        static_parameters=None,
-        keep_previous=False,
-        max_previous=None,
-        metric_fn=None,
-        plot_metric_progression=False,
-        max_metric_subplots=1,
-        **kwargs,
-    ):
+        model: type[Any] | Callable[..., Any],
+        train_series: Any,
+        test_series: Any,
+        forecast_steps: int,
+        dynamic_parameter: str | None = None,
+        static_parameters: dict[str, Any] | None = None,
+        keep_previous: bool = False,
+        max_previous: int | None = None,
+        metric_fn: Callable[..., float] | list[Callable[..., float]] | None = None,
+        plot_metric_progression: bool = False,
+        max_metric_subplots: int = 1,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the forecasting animation class.
 
         Args:
@@ -66,8 +71,14 @@ class ForecastingAnimation(AnimationBase):
         self.forecast_line = None
 
     def setup_plot(
-        self, title, xlabel, ylabel, legend_loc="upper left", grid=True, figsize=(12, 6)
-    ):
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        legend_loc: str | None = "upper left",
+        grid: bool = True,
+        figsize: tuple[int, int] = (12, 6),
+    ) -> None:
         """Set up the plot for forecasting animation."""
         super().setup_plot(title, xlabel, ylabel, legend_loc, grid, figsize)
 
@@ -92,7 +103,7 @@ class ForecastingAnimation(AnimationBase):
             # Add legend to the plot
             self.ax.legend(loc=legend_loc, **self.legend_kwargs)
 
-    def update_model(self, frame):
+    def update_model(self, frame: Any) -> None:
         """Update the model for the current frame.
 
         Args:
@@ -165,7 +176,7 @@ class ForecastingAnimation(AnimationBase):
         self.fitted_values = np.asarray(self.fitted_values).flatten()
         self.forecast_values = np.asarray(self.forecast_values).flatten()
 
-    def update_plot(self, frame):
+    def update_plot(self, frame: Any) -> list[Any]:
         """Update the plot for the current frame.
 
         Args:

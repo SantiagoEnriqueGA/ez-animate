@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import warnings
+from collections.abc import Callable
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,21 +16,21 @@ class ClusteringAnimation(AnimationBase):
 
     def __init__(
         self,
-        model,
-        data,
-        labels=None,
-        test_size=0.3,
-        dynamic_parameter=None,
-        static_parameters=None,
-        keep_previous=False,
-        trace_centers=False,
-        scaler=None,
-        pca_components=2,
-        metric_fn=None,
-        plot_metric_progression=False,
-        max_metric_subplots=1,
-        **kwargs,
-    ):
+        model: type[Any] | Callable[..., Any],
+        data: np.ndarray,
+        labels: np.ndarray | list[int] | None = None,
+        test_size: float = 0.3,
+        dynamic_parameter: str | None = None,
+        static_parameters: dict[str, Any] | None = None,
+        keep_previous: bool = False,
+        trace_centers: bool | None = False,
+        scaler: Any | None = None,
+        pca_components: int = 2,
+        metric_fn: Callable[..., float] | list[Callable[..., float]] | None = None,
+        plot_metric_progression: bool = False,
+        max_metric_subplots: int = 1,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the clustering animation class.
 
         Args:
@@ -134,14 +138,14 @@ class ClusteringAnimation(AnimationBase):
 
     def setup_plot(
         self,
-        title,
-        xlabel,
-        ylabel,
-        use_true_labels=False,
-        legend_loc="upper left",
-        grid=True,
-        figsize=(12, 6),
-    ):
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        use_true_labels: bool = False,
+        legend_loc: str | None = "upper left",
+        grid: bool = True,
+        figsize: tuple[int, int] = (12, 6),
+    ) -> None:
         """Set up the plot for the clustering animation.
 
         Args:
@@ -206,7 +210,7 @@ class ClusteringAnimation(AnimationBase):
         if self.add_legend:
             self.ax.legend(loc=legend_loc)
 
-    def update_model(self, frame):
+    def update_model(self, frame: Any) -> None:
         """Update the clustering model for the current frame.
 
         Args:
@@ -232,7 +236,7 @@ class ClusteringAnimation(AnimationBase):
         else:
             self.model_instance.fit(self.X_train)
 
-    def update_plot(self, frame):
+    def update_plot(self, frame: Any) -> tuple[Any, ...]:
         """Update the plot for the current frame.
 
         Args:
