@@ -3,6 +3,7 @@ nav:
   - Home: index.md
   - Getting Started: getting_started.md
   - Usage: usage.md
+  - Compatibility: compatibility.md
   - API Reference: api.md
   - Gallery: gallery.md
   - Contributing: contributing.md
