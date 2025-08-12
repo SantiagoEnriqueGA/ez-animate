@@ -108,6 +108,7 @@ ClusteringAnimation(
     model,
     data,
     labels=None,
+    use_true_labels=False,
     test_size=0.3,
     dynamic_parameter=None,
     static_parameters=None,
@@ -126,6 +127,7 @@ ClusteringAnimation(
 - `model`: Clustering model class (e.g., `KMeans`, `DBSCAN`).
 - `data`: Input data for clustering (2D array-like).
 - `labels`: Optional true labels for coloring points (1D array-like or list).
+- `use_true_labels`: Whether to color points by true labels if available (default: False).
 - `test_size`: Fraction of data to use for testing (default: 0.3).
 - `dynamic_parameter`: Parameter to vary dynamically (e.g., `n_clusters`).
 - `static_parameters`: Dictionary of static parameters (e.g., `{'init': 'k-means++'}`).
