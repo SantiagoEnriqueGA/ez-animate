@@ -15,6 +15,7 @@ wheels/
 # Cache files
 .pytest_cache
 .ruff_cache
+.mypy_cache
 
 # Coverage files
 .coverage

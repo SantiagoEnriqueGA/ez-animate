@@ -61,8 +61,8 @@ You'll know the environment is active when you see `(.venv)` at the beginning of
 Install the project in "editable" mode along with all development dependencies (for testing, linting, and documentation).
 
 ```bash
-# This command installs ez-animate, pytest, black, ruff, and mkdocs
-uv pip install -e .[test,lint,docs]
+# Recommended: install all dev tools (tests, linting, docs)
+uv pip install -e .[dev]
 ```
 
 **Why this command?**
@@ -71,6 +71,13 @@ uv pip install -e .[test,lint,docs]
 -   `[test,lint,docs]`: These are "extras" defined in our `pyproject.toml`. They install the optional groups of dependencies needed for running tests, checking code style, and building the documentation.
 
 You are now ready to start developing!
+
+Tip: set up pre-commit to run Ruff and mypy locally before each commit:
+
+```bash
+uv run pre-commit install
+uv run pre-commit run --all-files
+```
 
 ## Running Tests
 
@@ -111,6 +118,26 @@ uv run ruff check . --fix
 ```
 
 The CI/CD pipeline will fail if your code is not properly formatted, so it's best to run this before committing.
+
+## Type checking (mypy)
+
+Static type checking is enforced for the library code with mypy. Configuration lives in `pyproject.toml` under `[tool.mypy]` and targets `src/ez_animate` by default.
+
+```bash
+# Ensure lint extras are installed
+uv pip install -e .[lint]
+
+# Run type checks (repository root)
+uv run mypy
+
+# Or explicitly target the package
+uv run mypy src/ez_animate
+```
+
+Notes:
+- The package distributes `py.typed` (PEP 561) and aims for strict-ish typing for public APIs.
+- The NumPy mypy plugin is enabled; `numpy` is already a dependency.
+- Keep new public functions and classes fully typed.
 
 ## Building the Documentation
 
