@@ -4,8 +4,11 @@ import warnings
 from collections.abc import Callable
 from typing import Any
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
+from matplotlib.collections import PathCollection
 
 from .animation_base import AnimationBase
 from .utils import PCA, train_test_split
@@ -17,8 +20,9 @@ class ClusteringAnimation(AnimationBase):
     def __init__(
         self,
         model: type[Any] | Callable[..., Any],
-        data: np.ndarray,
-        labels: np.ndarray | list[int] | None = None,
+        data: npt.NDArray[Any],
+        labels: npt.NDArray[Any] | list[int] | None = None,
+        use_true_labels: bool = False,
         test_size: float = 0.3,
         dynamic_parameter: str | None = None,
         static_parameters: dict[str, Any] | None = None,
@@ -37,6 +41,7 @@ class ClusteringAnimation(AnimationBase):
             model: The clustering model (e.g., KMeans instance).
             data: The input data for clustering.
             labels: Optional true labels for coloring points.
+            use_true_labels: Whether to color points by true labels if available (used in setup_plot).
             test_size: Proportion of data to use as test set.
             dynamic_parameter: The parameter to update dynamically (e.g., 'n_iter').
             static_parameters: Static parameters for the model.
@@ -66,6 +71,8 @@ class ClusteringAnimation(AnimationBase):
             raise ValueError("pca_components must be an integer greater than 0.")
         if trace_centers is not None and not isinstance(trace_centers, bool):
             raise ValueError("trace_centers must be a boolean.")
+        if not isinstance(use_true_labels, bool):
+            raise ValueError("use_true_labels must be a boolean.")
 
         self.scaler_instance = scaler
         self.pca_instance = None
@@ -126,14 +133,19 @@ class ClusteringAnimation(AnimationBase):
         self._set_kwargs(**kwargs, subclass="ClusteringAnimation")
         self.keep_previous = keep_previous
         self.trace_centers = trace_centers
-        self.previous_centers = []
-        self.previous_labels = []
+        self.use_true_labels = use_true_labels
+        self.previous_centers: list[npt.NDArray[Any]] = []
+        self.previous_labels: list[npt.NDArray[Any]] = []
+
+        # Explicitly declare plot artists for mypy
+        self.cluster_centers_plot: list[PathCollection] = []
+        self.cluster_assignments_plot: list[PathCollection] = []
 
         self.labels = labels
         if labels is not None:
             # Store unique classes and assign colors
             self.unique_labels = np.unique(labels)
-            cmap = plt.cm.coolwarm  # Default colormap
+            cmap = mpl.colormaps["coolwarm"]  # Default colormap
             self.colors = cmap(np.linspace(0, 1, len(self.unique_labels)))
 
     def setup_plot(
@@ -141,7 +153,6 @@ class ClusteringAnimation(AnimationBase):
         title: str,
         xlabel: str,
         ylabel: str,
-        use_true_labels: bool = False,
         legend_loc: str | None = "upper left",
         grid: bool = True,
         figsize: tuple[int, int] = (12, 6),
@@ -152,7 +163,8 @@ class ClusteringAnimation(AnimationBase):
             title: Title of the plot.
             xlabel: Label for the x-axis.
             ylabel: Label for the y-axis.
-            use_true_labels: Whether to color points by true labels if available.
+            Note: Whether to color points by true labels if available is controlled by
+                the constructor argument `use_true_labels`.
             legend_loc: Location of the legend.
             grid: Whether to display a grid.
             figsize: Size of the figure.
@@ -165,11 +177,15 @@ class ClusteringAnimation(AnimationBase):
             title, effective_xlabel, effective_ylabel, legend_loc, grid, figsize
         )
 
+        # mypy: ensure axes exist after base setup
+        assert self.ax is not None, "Axes should be initialized by setup_plot"
+        ax = self.ax
+
         # Plot the points colored by their cluster labels (training data)
-        if self.labels is not None and use_true_labels:
+        if self.labels is not None and self.use_true_labels:
             for i, label in enumerate(self.unique_labels):
                 mask = self.y_train == label
-                self.ax.scatter(
+                ax.scatter(
                     self.X_train[mask, 0],
                     self.X_train[mask, 1],
                     color=self.colors[i],
@@ -179,7 +195,7 @@ class ClusteringAnimation(AnimationBase):
             # Plot test data points
             for i, label in enumerate(self.unique_labels):
                 mask = self.y_test == label
-                self.ax.scatter(
+                ax.scatter(
                     self.X_test[mask, 0],
                     self.X_test[mask, 1],
                     color=self.colors[i],
@@ -189,12 +205,12 @@ class ClusteringAnimation(AnimationBase):
 
         else:
             # Plot all points in gray, we will update colors in animation
-            self.ax.scatter(
+            ax.scatter(
                 self.X_train[:, 0],
                 self.X_train[:, 1],
                 **self.cluster_gray_train_kwargs,
             )
-            self.ax.scatter(
+            ax.scatter(
                 self.X_test[:, 0],
                 self.X_test[:, 1],
                 **self.cluster_gray_test_kwargs,
@@ -204,11 +220,11 @@ class ClusteringAnimation(AnimationBase):
         all_data = np.vstack((self.X_train, self.X_test))
         x_min, x_max = all_data[:, 0].min() - 1, all_data[:, 0].max() + 1
         y_min, y_max = all_data[:, 1].min() - 1, all_data[:, 1].max() + 1
-        self.ax.set_xlim(x_min, x_max)
-        self.ax.set_ylim(y_min, y_max)
+        ax.set_xlim(x_min, x_max)
+        ax.set_ylim(y_min, y_max)
 
         if self.add_legend:
-            self.ax.legend(loc=legend_loc)
+            ax.legend(loc=legend_loc)
 
     def update_model(self, frame: Any) -> None:
         """Update the clustering model for the current frame.
@@ -242,6 +258,10 @@ class ClusteringAnimation(AnimationBase):
         Args:
             frame: The current frame index.
         """
+        # Ensure axes exist (helps mypy refine type from Axes | None to Axes)
+        assert self.ax is not None, "Axes should be initialized by setup_plot"
+        ax = self.ax
+
         # Remove previous cluster centers and assignments if present
         if hasattr(self, "cluster_centers_plot") and self.cluster_centers_plot:
             try:
@@ -288,7 +308,7 @@ class ClusteringAnimation(AnimationBase):
             # Mask for X_train
             mask_train = cluster_labels[:n_train] == i
             if np.any(mask_train):
-                scatter_train = self.ax.scatter(
+                scatter_train = ax.scatter(
                     self.X_train[mask_train, 0],
                     self.X_train[mask_train, 1],
                     color=cmap(i),
@@ -299,7 +319,7 @@ class ClusteringAnimation(AnimationBase):
             # Mask for X_test
             mask_test = cluster_labels[n_train:] == i
             if np.any(mask_test):
-                scatter_test = self.ax.scatter(
+                scatter_test = ax.scatter(
                     self.X_test[mask_test, 0],
                     self.X_test[mask_test, 1],
                     color=cmap(i),
@@ -314,7 +334,7 @@ class ClusteringAnimation(AnimationBase):
         if centers is not None:
             if self.pca_instance is not None and centers.shape[1] != 2:
                 centers = self.pca_instance.transform(centers)
-            center_plot = self.ax.scatter(
+            center_plot = ax.scatter(
                 centers[:, 0],
                 centers[:, 1],
                 c=cmap(np.arange(n_clusters)),
@@ -331,7 +351,7 @@ class ClusteringAnimation(AnimationBase):
                 alpha = 0.1 + 0.4 / max(1, n_prev - 1) * i if n_prev > 1 else 0.1
                 prev_kwargs = dict(self.prev_center_kwargs)
                 prev_kwargs["alpha"] = alpha
-                prev_plot = self.ax.scatter(
+                prev_plot = ax.scatter(
                     prev[:, 0],
                     prev[:, 1],
                     **prev_kwargs,
@@ -340,8 +360,11 @@ class ClusteringAnimation(AnimationBase):
 
         # Trace cluster centers with lines if enabled and number of centers is consistent
         if self.trace_centers and len(self.previous_centers) > 1:
-            # Only draw lines if all previous centers have the same shape as current
-            consistent = all(pc.shape == centers.shape for pc in self.previous_centers)
+            # Only draw lines if all previous centers have the same shape as the most recent
+            reference_shape = self.previous_centers[-1].shape
+            consistent = all(
+                pc.shape == reference_shape for pc in self.previous_centers
+            )
             if consistent:
                 # Draw a line for each center across all iterations
                 prev_arr = np.stack(
@@ -351,7 +374,7 @@ class ClusteringAnimation(AnimationBase):
                 for k in range(n_centers):
                     trace_kwargs = dict(self.trace_line_kwargs)
                     trace_kwargs["color"] = cmap(k)
-                    self.ax.plot(
+                    ax.plot(
                         prev_arr[:, k, 0],
                         prev_arr[:, k, 1],
                         **trace_kwargs,
@@ -365,7 +388,7 @@ class ClusteringAnimation(AnimationBase):
                 )
 
         # Update the title with the current frame and optional metrics
-        def is_clustering_metric(fn):
+        def is_clustering_metric(fn: Callable[..., Any]) -> bool:
             # Check for common clustering metric names
             clustering_metrics = [
                 "silhouette_score",
@@ -401,15 +424,15 @@ class ClusteringAnimation(AnimationBase):
                 self.plot_metric_progression
                 and getattr(self, "metric_lines", None) is not None
             ):
-                self.ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
+                ax.set_title(f"{self.dynamic_parameter}={frame_rounded}")
             else:
-                self.ax.set_title(
+                ax.set_title(
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
                     fontsize=10,
                 )
             print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:
-            self.ax.set_title(f"Clustering ({self.dynamic_parameter}={frame})")
+            ax.set_title(f"Clustering ({self.dynamic_parameter}={frame})")
             print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting

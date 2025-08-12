@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
-from scipy import sparse
 
 
 def train_test_split(
@@ -49,14 +48,15 @@ def train_test_split(
 
     # Get number of samples
     first_array = arrays[0]
-    if sparse.issparse(first_array) or hasattr(first_array, "shape"):
+    # Treat numpy arrays and sparse-like matrices uniformly via presence of 'shape'
+    if hasattr(first_array, "shape"):
         n_samples = first_array.shape[0]
     else:
         n_samples = len(first_array)
 
     # Validate array lengths
     for array in arrays:
-        if sparse.issparse(array) or hasattr(array, "shape"):
+        if hasattr(array, "shape"):
             if array.shape[0] != n_samples:
                 raise ValueError("Arrays must have the same length")
         elif len(array) != n_samples:
@@ -92,9 +92,9 @@ def train_test_split(
                 raise ValueError("test_size must be between 0 and 1")
             n_test = int(np.ceil(test_size * n_samples))
         else:  # test_size is an integer
-            if test_size < 0 or test_size > n_samples:
+            if test_size is None or test_size < 0 or test_size > n_samples:
                 raise ValueError(f"test_size must be between 0 and {n_samples}")
-            n_test = test_size
+            n_test = int(test_size)
         n_train = n_samples - n_test
     else:
         if isinstance(train_size, float):
@@ -128,8 +128,8 @@ def train_test_split(
             test_indices = indices[n_train : n_train + n_test]
         else:
             # Stratified shuffle splitting using proportional allocation
-            train_indices = []
-            test_indices = []
+            train_idx_list: list[int] = []
+            test_idx_list: list[int] = []
             unique_classes = np.unique(stratify)
             # Calculate per-class allocation for train set
             base_train_counts = {}
@@ -165,11 +165,11 @@ def train_test_split(
                 if class_counts[cls] > 1 and (class_counts[cls] - n_train_cls) < 1:
                     n_train_cls = class_counts[cls] - 1
                 _n_test_cls = class_counts[cls] - n_train_cls
-                train_indices.extend(cls_idx[:n_train_cls])
-                test_indices.extend(cls_idx[n_train_cls:])
+                train_idx_list.extend(cls_idx[:n_train_cls].tolist())
+                test_idx_list.extend(cls_idx[n_train_cls:].tolist())
 
-            train_indices = np.array(train_indices)
-            test_indices = np.array(test_indices)
+            train_indices = np.array(train_idx_list)
+            test_indices = np.array(test_idx_list)
             # If numbers don't match exactly due to rounding, adjust randomly
             if len(train_indices) != n_train:
                 np.random.shuffle(train_indices)
@@ -185,15 +185,10 @@ def train_test_split(
     # Split the arrays while preserving their type (especially for numpy arrays)
     result: list[Any] = []
     for array in arrays:
-        if sparse.issparse(array):
-            train = array[train_indices]
-            test = array[test_indices]
-        elif hasattr(array, "iloc"):  # pandas DataFrame or Series
+        if hasattr(array, "iloc"):  # pandas DataFrame or Series
             train = array.iloc[train_indices]
             test = array.iloc[test_indices]
-        elif isinstance(
-            array, np.ndarray
-        ):  # handles 1D and multi-dimensional NumPy arrays
+        elif hasattr(array, "shape"):
             train = array[train_indices]
             test = array[test_indices]
         else:  # list or other sequence
@@ -272,7 +267,7 @@ class PCA:
             else np.zeros_like(self.explained_variance_)
         )
 
-    def transform(self, X: NDArray[Any]) -> NDArray[Any]:
+    def transform(self, X: NDArray[Any]) -> NDArray[np.floating]:
         """Applies dimensionality reduction on the input data.
 
         Args:
@@ -296,12 +291,12 @@ class PCA:
             )
 
         # Project data to the principal component space
-        X = X - self.mean_
+        X_centered = cast(NDArray[np.floating], X - self.mean_)
         if self.components_ is None:
             raise ValueError(
                 "PCA instance is not fitted. Components are not available."
             )
-        return np.dot(X, self.components_)
+        return cast(NDArray[np.floating], np.dot(X_centered, self.components_))
 
     def fit_transform(self, X: NDArray[Any]) -> NDArray[Any]:
         """Fits the PCA model and applies dimensionality reduction on the input data.
@@ -359,4 +354,4 @@ class PCA:
             raise ValueError(
                 "PCA instance is not fitted. Components/mean are not available."
             )
-        return np.dot(X_reduced, self.components_.T) + self.mean_
+        return cast(NDArray[Any], np.dot(X_reduced, self.components_.T) + self.mean_)
