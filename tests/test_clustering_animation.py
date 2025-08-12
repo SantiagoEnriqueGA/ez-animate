@@ -307,6 +307,7 @@ class TestClusteringAnimation(BaseTest):
             model=KMeans,
             data=self.X,
             labels=self.y,
+            use_true_labels=True,
             test_size=0.25,
             dynamic_parameter="n_init",
             static_parameters={"n_clusters": 3},
@@ -316,7 +317,6 @@ class TestClusteringAnimation(BaseTest):
             "Clustering",
             "F1",
             "F2",
-            use_true_labels=True,
             legend_loc="upper right",
             grid=True,
         )
