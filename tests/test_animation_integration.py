@@ -164,6 +164,17 @@ class TestAnimationBase(BaseTest):
             animator.save("test_animation.mp4")
         plt.close(animator.fig)
 
+    def test_animate_no_setup(self):
+        """Test that animate() raises an error if setup_plot() has not been called."""
+        animator = ForecastingAnimation(
+            model=ExponentialMovingAverage,
+            train_series=np.array([1, 2, 3]),
+            test_series=np.array([4, 5, 6]),
+            forecast_steps=3,
+            dynamic_parameter="alpha",
+        )
+        with self.assertRaises(RuntimeError):
+            animator.animate(frames=[0], interval=150, blit=True, repeat=False)
 
 class TestAnimationIntegration(BaseTest):
     """Integration tests for animation classes."""

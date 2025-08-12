@@ -95,6 +95,30 @@ class TestPCA(BaseTest):
         explained_variance_ratio = pca.get_explained_variance_ratio()
         self.assertEqual(len(explained_variance_ratio), 2)
 
+    def test_transform_before_fit_raises(self):
+        """Calling transform before fit should raise ValueError."""
+        pca = PCA(n_components=2)
+        with self.assertRaises(ValueError):
+            pca.transform(np.random.rand(5, 2))
+
+    def test_get_explained_variance_ratio_before_fit_raises(self):
+        """Calling get_explained_variance_ratio before fit should raise ValueError."""
+        pca = PCA(n_components=2)
+        with self.assertRaises(ValueError):
+            pca.get_explained_variance_ratio()
+
+    def test_get_components_before_fit_raises(self):
+        """Calling get_components before fit should raise ValueError."""
+        pca = PCA(n_components=2)
+        with self.assertRaises(ValueError):
+            pca.get_components()
+
+    def test_inverse_transform_before_fit_raises(self):
+        """Calling inverse_transform before fit should raise ValueError."""
+        pca = PCA(n_components=2)
+        with self.assertRaises(ValueError):
+            pca.inverse_transform(np.random.rand(5, 2))
+
 
 class TestFuncs(BaseTest):
     """Unit tests for the utility functions."""
@@ -279,6 +303,15 @@ class TestFuncs(BaseTest):
         with self.assertRaises(ValueError):
             train_test_split(X, y, test_size=1.1)
 
+    def test_invalid_train_size_float(self):
+        """train_size as float <0 or >1 should raise ValueError."""
+        X = np.arange(10).reshape(5, 2)
+        y = np.arange(5)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, train_size=-0.1)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, train_size=1.1)
+
     def test_invalid_test_size_int(self):
         """Test that test_size < 0 or > n_samples as int raises ValueError."""
         X = np.arange(10).reshape(5, 2)
@@ -294,6 +327,13 @@ class TestFuncs(BaseTest):
         y = np.arange(5)
         with self.assertRaises(ValueError):
             train_test_split(X, y, train_size=3, test_size=3)
+
+    def test_sum_train_test_size_exceeds_float(self):
+        """Float train_size + float test_size > 1 should raise ValueError after rounding."""
+        X = np.arange(20).reshape(10, 2)
+        y = np.arange(10)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, train_size=0.6, test_size=0.5)
 
     def test_rounding_adjustment(self):
         """Test rounding adjustment for stratified split (line 161)."""
@@ -368,6 +408,18 @@ class TestFuncs(BaseTest):
         # Check that class proportions are preserved
         self.assertAlmostEqual(sum(y_train) / len(y_train), sum(y) / len(y), delta=0.1)
 
+    def test_stratify_ensure_min_one_in_test(self):
+        """Minority class should have at least one sample in test due to guard in allocation."""
+        X = np.arange(200).reshape(100, 2)
+        y = np.array([0] * 80 + [1] * 20)
+        # n_train will be 90 (with test_size=0.1), which might allocate both minority samples to train.
+        # The implementation should force at least one to remain in test.
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.01, stratify=y, random_state=0
+        )
+        self.assertGreaterEqual(len(y_test), 1)
+        self.assertGreaterEqual(len(y_train), 98)
+
     def test_pandas_dataframe_and_series_split(self):
         """Test splitting pandas DataFrame and Series (lines 170-171)."""
         X = pd.DataFrame({"a": range(10), "b": range(10, 20)})
@@ -419,6 +471,13 @@ class TestUtilsOther(unittest.TestCase):
             train_test_split(X, y, test_size=-1)
         with self.assertRaises(ValueError):
             train_test_split(X, y, test_size=6)
+
+    def test_train_size_negative_int_out_of_bounds(self):
+        """Negative integer train_size should raise ValueError."""
+        X = np.arange(10).reshape(5, 2)
+        y = np.arange(5)
+        with self.assertRaises(ValueError):
+            train_test_split(X, y, train_size=-1)
 
     def test_stratified_rounding_adjustment(self):
         """Rounding adjustment in stratified split preserves sizes."""

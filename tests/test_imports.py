@@ -1,6 +1,9 @@
+import importlib
 import os
 import sys
 import unittest
+from importlib.metadata import PackageNotFoundError
+from unittest import mock
 
 # Change the working directory to the parent directory to allow importing the package.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -28,6 +31,8 @@ class TestImports(BaseTest):
         self.assertTrue(hasattr(ez_animate, "ClassificationAnimation"))
         self.assertTrue(hasattr(ez_animate, "ForecastingAnimation"))
         self.assertTrue(hasattr(ez_animate, "RegressionAnimation"))
+        self.assertTrue(hasattr(ez_animate, "ClusteringAnimation"))
+        self.assertTrue(hasattr(ez_animate, "TransformationAnimation"))
 
         # Utility Functions
         self.assertTrue(hasattr(ez_animate, "PCA"))
@@ -61,6 +66,7 @@ class TestImports(BaseTest):
         self.assertIsNotNone(ForecastingAnimation)
         self.assertIsNotNone(RegressionAnimation)
         self.assertIsNotNone(ClusteringAnimation)
+        self.assertIsNotNone(TransformationAnimation)
 
     def test_imports_from_utils(self):
         """Test that utility functions can be imported correctly."""
@@ -75,8 +81,30 @@ class TestImports(BaseTest):
         self.assertIsNotNone(RegressionAnimation)
         self.assertIsNotNone(ClassificationAnimation)
         self.assertIsNotNone(ClusteringAnimation)
+        self.assertIsNotNone(TransformationAnimation)
         self.assertIsNotNone(PCA)
         self.assertIsNotNone(train_test_split)
+
+    def test_version_fallback_on_missing_metadata(self):
+        """When importlib.metadata.version raises PackageNotFoundError, __version__ should be '0.0.0'."""
+        original_module = sys.modules.get("ez_animate")
+        try:
+            # Remove cached module so import executes __init__ again under the patch
+            if "ez_animate" in sys.modules:
+                del sys.modules["ez_animate"]
+
+            with mock.patch(
+                "importlib.metadata.version", side_effect=PackageNotFoundError
+            ):
+                ez_animate = importlib.import_module("ez_animate")
+                self.assertEqual(ez_animate.__version__, "0.0.0")
+        finally:
+            # Restore original module (if it existed) to avoid affecting other tests
+            if original_module is not None:
+                sys.modules["ez_animate"] = original_module
+            else:
+                # Ensure a clean state if we created a temporary module instance
+                sys.modules.pop("ez_animate", None)
 
 
 if __name__ == "__main__":
