@@ -1,0 +1,1430 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../compatibility/">
+      
+      
+        <link rel="next" href="../gallery/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>API Reference - ez-animate Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="ez-animate Docs" class="md-header__button md-logo" aria-label="ez-animate Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ez-animate Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="ez-animate Docs" class="md-nav__button md-logo" aria-label="ez-animate Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ez-animate Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compatibility
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#animation-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Animation Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Animation Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regressionanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      RegressionAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RegressionAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classificationanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClassificationAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClassificationAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clusteringanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClusteringAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClusteringAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forecastinganimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      ForecastingAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ForecastingAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformationanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformationAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TransformationAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup_plot
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#animate" class="md-nav__link">
+    <span class="md-ellipsis">
+      animate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#save" class="md-nav__link">
+    <span class="md-ellipsis">
+      save
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show" class="md-nav__link">
+    <span class="md-ellipsis">
+      show
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customization-with-kwargs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customization with **kwargs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customization with **kwargs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-keyword-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Keyword Arguments
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Keyword Arguments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-plot-customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Plot Customization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metric-subplot-customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Metric Subplot Customization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-specific-keyword-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Class-Specific Keyword Arguments
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Class-Specific Keyword Arguments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regressionanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      RegressionAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classificationanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClassificationAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clusteringanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClusteringAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forecastinganimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ForecastingAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformationanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformationAnimation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gallery
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#animation-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Animation Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Animation Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regressionanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      RegressionAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RegressionAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classificationanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClassificationAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClassificationAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clusteringanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClusteringAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ClusteringAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forecastinganimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      ForecastingAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ForecastingAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformationanimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformationAnimation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TransformationAnimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup_plot
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#animate" class="md-nav__link">
+    <span class="md-ellipsis">
+      animate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#save" class="md-nav__link">
+    <span class="md-ellipsis">
+      save
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#show" class="md-nav__link">
+    <span class="md-ellipsis">
+      show
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customization-with-kwargs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customization with **kwargs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customization with **kwargs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-keyword-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Keyword Arguments
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Keyword Arguments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-plot-customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Plot Customization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metric-subplot-customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Metric Subplot Customization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-specific-keyword-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Class-Specific Keyword Arguments
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Class-Specific Keyword Arguments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#regressionanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      RegressionAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classificationanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClassificationAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clusteringanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClusteringAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forecastinganimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ForecastingAnimation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformationanimation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformationAnimation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="api-reference">API Reference</h1>
+<h2 id="animation-classes">Animation Classes</h2>
+<p>This section describes the main animation classes provided by <code>ez-animate</code>. Each class is designed to create specific types of animations for different use cases, such as regression, classification, clustering, forecasting, and data transformation.</p>
+<h3 id="regressionanimation">RegressionAnimation</h3>
+<p>Creates Matplotlib animations for regression models.</p>
+<ul>
+<li>Inherits from <code>AnimationBase</code>.</li>
+<li>Accepts a regression model, feature matrix <code>X</code>, and target vector <code>y</code>.</li>
+<li>Supports dynamic and static model parameters, PCA, and plot customization.</li>
+<li>Returns a Matplotlib <code>FuncAnimation</code> object for display or saving.</li>
+</ul>
+<p><strong>Constructor:</strong>
+<div class="highlight"><pre><span></span><code><span class="n">RegressionAnimation</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">dynamic_parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">keep_previous</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">pca_components</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">metric_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_metric_progression</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_metric_subplots</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span>
+</code></pre></div></p>
+<h4 id="parameters">Parameters:</h4>
+<ul>
+<li><code>model</code>: Regression model class (e.g., <code>LinearRegression</code>, <code>SVR</code>).</li>
+<li><code>X</code>: Feature matrix (2D array-like).</li>
+<li><code>y</code>: Target vector (1D array-like).</li>
+<li><code>test_size</code>: Fraction of data to use for testing (default: 0.3).</li>
+<li><code>dynamic_parameter</code>: Parameter to vary dynamically (e.g., <code>C</code> for SVR).</li>
+<li><code>static_parameters</code>: Dictionary of static parameters (e.g., <code>{'kernel': 'linear'}</code>).</li>
+<li><code>keep_previous</code>: Whether to keep and display previous model states (default: False).</li>
+<li><code>max_previous</code>: Maximum number of previous states to keep (default: None).</li>
+<li><code>pca_components</code>: Number of PCA components to reduce dimensionality (default: 1).</li>
+<li><code>metric_fn</code>: Optional metric function or list of functions (e.g., MSE, R2) to calculate and display during animation.</li>
+<li><code>plot_metric_progression</code>: Whether to plot the progression of the metric over time.</li>
+<li><code>max_metric_subplots</code>: Maximum number of subplots to show for metric progression (if multiple metrics).</li>
+<li><code>**kwargs</code>: Additional keyword arguments for plot customization. See the "Customization with <strong>kwargs</strong>" section for details.</li>
+</ul>
+<h3 id="classificationanimation">ClassificationAnimation</h3>
+<p>Creates Matplotlib animations for classification models.
+- Inherits from <code>AnimationBase</code>.
+- Accepts a classification model, feature matrix <code>X</code>, and target vector <code>y</code>.
+- Supports dynamic/static parameters, PCA, scaling, and plot customization.
+- Returns a Matplotlib <code>FuncAnimation</code> object for display or saving.</p>
+<p><strong>Constructor:</strong>
+<div class="highlight"><pre><span></span><code><span class="n">ClassificationAnimation</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">dynamic_parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">keep_previous</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">scaler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">pca_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">plot_step</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+    <span class="n">metric_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_metric_progression</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_metric_subplots</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span>
+</code></pre></div></p>
+<h4 id="parameters_1">Parameters:</h4>
+<ul>
+<li><code>model</code>: Classification model class (e.g., <code>LogisticRegression</code>, <code>SVC</code>).</li>
+<li><code>X</code>: Feature matrix (2D array-like).</li>
+<li><code>y</code>: Target vector (1D array-like).</li>
+<li><code>test_size</code>: Fraction of data to use for testing (default: 0.3).</li>
+<li><code>dynamic_parameter</code>: Parameter to vary dynamically (e.g., <code>C</code> for SVC).</li>
+<li><code>static_parameters</code>: Dictionary of static parameters (e.g., <code>{'kernel': 'rbf'}</code>).</li>
+<li><code>keep_previous</code>: Whether to keep and display previous model states (default: False).</li>
+<li><code>scaler</code>: Scaler instance for preprocessing (e.g., <code>StandardScaler</code>).</li>
+<li><code>pca_components</code>: Number of PCA components to reduce dimensionality (default: 2).</li>
+<li><code>plot_step</code>: Step size for mesh grid in decision boundary plots (default: 0.02).</li>
+<li><code>metric_fn</code>: Optional metric function or list of functions (e.g., accuracy, F1) to calculate and display during animation.</li>
+<li><code>plot_metric_progression</code>: Whether to plot the progression of the metric over time.</li>
+<li><code>max_metric_subplots</code>: Maximum number of subplots to show for metric progression (if multiple metrics).</li>
+<li><code>**kwargs</code>: Additional keyword arguments for plot customization. See the "Customization with <strong>kwargs</strong>" section for details.</li>
+</ul>
+<h3 id="clusteringanimation">ClusteringAnimation</h3>
+<p>Creates Matplotlib animations for clustering models (e.g., K-Means).</p>
+<ul>
+<li>Inherits from <code>AnimationBase</code>.</li>
+<li>Accepts a clustering model, input data, and optional true labels.</li>
+<li>Supports dynamic/static parameters, PCA, scaling, cluster center tracing, and plot customization.</li>
+<li>Returns a Matplotlib <code>FuncAnimation</code> object for display or saving.</li>
+</ul>
+<p><strong>Constructor:</strong>
+<div class="highlight"><pre><span></span><code><span class="n">ClusteringAnimation</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">use_true_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">dynamic_parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">keep_previous</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">trace_centers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">scaler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">pca_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">metric_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_metric_progression</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_metric_subplots</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span>
+</code></pre></div></p>
+<h4 id="parameters_2">Parameters:</h4>
+<ul>
+<li><code>model</code>: Clustering model class (e.g., <code>KMeans</code>, <code>DBSCAN</code>).</li>
+<li><code>data</code>: Input data for clustering (2D array-like).</li>
+<li><code>labels</code>: Optional true labels for coloring points (1D array-like or list).</li>
+<li><code>use_true_labels</code>: Whether to color points by true labels if available (default: False).</li>
+<li><code>test_size</code>: Fraction of data to use for testing (default: 0.3).</li>
+<li><code>dynamic_parameter</code>: Parameter to vary dynamically (e.g., <code>n_clusters</code>).</li>
+<li><code>static_parameters</code>: Dictionary of static parameters (e.g., <code>{'init': 'k-means++'}</code>).</li>
+<li><code>keep_previous</code>: Whether to keep and display previous cluster assignments/centers (default: False).</li>
+<li><code>trace_centers</code>: Whether to trace the movement of cluster centers over iterations (default: False).</li>
+<li><code>scaler</code>: Scaler instance for preprocessing (e.g., <code>StandardScaler</code>).</li>
+<li><code>pca_components</code>: Number of PCA components to reduce dimensionality (default: 2).</li>
+<li><code>metric_fn</code>: Optional metric function or list of functions (e.g., silhouette_score) to calculate and display during animation.</li>
+<li><code>plot_metric_progression</code>: Whether to plot the progression of metrics over frames.</li>
+<li><code>max_metric_subplots</code>: Maximum number of metric subplots to display.</li>
+<li><code>**kwargs</code>: Additional keyword arguments for plot customization. See the "Customization with <strong>kwargs</strong>" section for details.</li>
+</ul>
+<h3 id="forecastinganimation">ForecastingAnimation</h3>
+<p>Creates Matplotlib animations for time series forecasting models.</p>
+<ul>
+<li>Inherits from <code>AnimationBase</code>.</li>
+<li>Accepts a forecasting model, training and test series, and forecast steps.</li>
+<li>Supports dynamic/static parameters and plot customization.</li>
+<li>Returns a Matplotlib <code>FuncAnimation</code> object for display or saving.</li>
+</ul>
+<p><strong>Constructor:</strong>
+<div class="highlight"><pre><span></span><code><span class="n">ForecastingAnimation</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">train_series</span><span class="p">,</span>
+    <span class="n">test_series</span><span class="p">,</span>
+    <span class="n">forecast_steps</span><span class="p">,</span>
+    <span class="n">dynamic_parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">static_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">keep_previous</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_metric_progression</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_metric_subplots</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">)</span>
+</code></pre></div></p>
+<h4 id="parameters_3">Parameters:</h4>
+<ul>
+<li><code>model</code>: Forecasting model class (e.g., <code>ARIMA</code>, <code>ExponentialSmoothing</code>).</li>
+<li><code>train_series</code>: Training time series data (1D or 2D array-like).</li>
+<li><code>test_series</code>: Test time series data (1D or 2D array-like).</li>
+<li><code>forecast_steps</code>: Number of steps to forecast at each frame.</li>
+<li><code>dynamic_parameter</code>: Parameter to vary dynamically (e.g., <code>order</code> for ARIMA).</li>
+<li><code>static_parameters</code>: Dictionary of static parameters (e.g., <code>{'trend': 'add'}</code>).</li>
+<li><code>keep_previous</code>: Whether to keep and display previous forecasts (default: False).</li>
+<li><code>max_previous</code>: Maximum number of previous forecasts to keep (default: None).</li>
+<li><code>metric_fn</code>: Optional metric function or list of functions (e.g., MSE, MAE) to calculate and display during animation.</li>
+<li><code>plot_metric_progression</code>: Whether to plot the progression of metrics over frames.</li>
+<li><code>max_metric_subplots</code>: Maximum number of metric subplots to display.</li>
+<li><code>**kwargs</code>: Additional keyword arguments for plot customization. See the "Customization with <strong>kwargs</strong>" section for details.</li>
+</ul>
+<h3 id="transformationanimation">TransformationAnimation</h3>
+<p>Creates Matplotlib animations for data transformation steps (e.g., scaling, normalization, PCA).</p>
+<ul>
+<li>Inherits from <code>AnimationBase</code>.</li>
+<li>Accepts a transformer class and input data <code>X</code>.</li>
+<li>Supports dynamic/static parameters, optional metric tracking, and plot customization.</li>
+<li>Returns a Matplotlib <code>FuncAnimation</code> object for display or saving.</li>
+</ul>
+<p><strong>Constructor:</strong>
+<div class="highlight"><pre><span></span><code><span class="n">TransformationAnimation</span><span class="p">(</span>
+  <span class="n">transformer</span><span class="p">,</span>
+  <span class="n">X</span><span class="p">,</span>
+  <span class="n">dynamic_parameter</span><span class="p">,</span>
+  <span class="n">static_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+  <span class="n">keep_previous</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">metric_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+  <span class="n">plot_metric_progression</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+  <span class="n">max_metric_subplots</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+  <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div></p>
+<h4 id="parameters_4">Parameters:</h4>
+<ul>
+<li><code>transformer</code>: Transformer class (e.g., <code>StandardScaler</code>, <code>MinMaxScaler</code>, <code>PCA</code>).</li>
+<li><code>X</code>: Input data array (2D array-like).</li>
+<li><code>dynamic_parameter</code>: Name of the transformer parameter to vary dynamically over frames (e.g., <code>n_components</code>, <code>feature_range</code>). Required.</li>
+<li><code>static_parameters</code>: Dictionary of static parameters for the transformer (default: <code>None</code>).</li>
+<li><code>keep_previous</code>: Whether to keep and display previous transformed states (default: <code>False</code>).</li>
+<li><code>metric_fn</code>: Optional metric function or list of functions to calculate and display during animation. Each function should accept <code>(X_original, X_transformed)</code> and return a numeric value (e.g., reconstruction error, average distance).</li>
+<li><code>plot_metric_progression</code>: Whether to plot the progression of the metric(s) over time.</li>
+<li><code>max_metric_subplots</code>: Maximum number of subplots to show for metric progression (if multiple metrics).</li>
+<li><code>**kwargs</code>: Additional keyword arguments for plot customization. See the "Customization with <strong>kwargs</strong>" section for details.</li>
+</ul>
+<h2 id="common-methods">Common Methods</h2>
+<p>All animation classes inherit the following methods:</p>
+<h3 id="setup_plot">setup_plot</h3>
+<p><div class="highlight"><pre><span></span><code><span class="n">setup_plot</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">,</span> <span class="n">legend_loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</code></pre></div>
+Set up the Matplotlib figure and axes for the animation.</p>
+<ul>
+<li><code>title</code>: Title of the plot.</li>
+<li><code>xlabel</code>: X-axis label.</li>
+<li><code>ylabel</code>: Y-axis label.</li>
+<li><code>legend_loc</code>: Legend location (default: "upper left").</li>
+<li><code>grid</code>: Show grid lines (default: True).</li>
+<li><code>figsize</code>: Figure size (default: (12, 6)).</li>
+</ul>
+<h3 id="animate">animate</h3>
+<p><div class="highlight"><pre><span></span><code><span class="n">animate</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+Create the animation using Matplotlib's <code>FuncAnimation</code>.</p>
+<ul>
+<li><code>frames</code>: Range or iterable of frames.</li>
+<li><code>interval</code>: Delay between frames in ms (default: 150).</li>
+<li><code>blit</code>: Use blitting for faster rendering (default: True).</li>
+<li><code>repeat</code>: Repeat the animation (default: False).</li>
+</ul>
+<h3 id="save">save</h3>
+<p><div class="highlight"><pre><span></span><code><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="s2">&quot;pillow&quot;</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</code></pre></div>
+Save the animation to a file (e.g., GIF or MP4).</p>
+<ul>
+<li><code>filename</code>: Output file path.</li>
+<li><code>writer</code>: Animation writer (default: "pillow").</li>
+<li><code>fps</code>: Frames per second (default: 5).</li>
+<li><code>dpi</code>: Dots per inch (default: 100).</li>
+</ul>
+<h3 id="show">show</h3>
+<p><div class="highlight"><pre><span></span><code><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+Display the animation in a window or notebook.</p>
+<h2 id="customization-with-kwargs">Customization with <code>**kwargs</code></h2>
+<p>You can customize the appearance of various plot elements by passing dictionaries of keyword arguments to the animation class constructor. These dictionaries are passed directly to the underlying Matplotlib plotting functions.</p>
+<h3 id="common-keyword-arguments">Common Keyword Arguments</h3>
+<p>These <code>kwargs</code> can be used with any animation class.</p>
+<h4 id="general-plot-customization">General Plot Customization</h4>
+<ul>
+<li><code>title_kwargs</code>: Customizes the main plot title. Passed to <code>ax.set_title()</code>.</li>
+<li>Example: <code>title_kwargs={'fontsize': 16, 'fontweight': 'bold'}</code></li>
+<li><code>suptitle_kwargs</code>: Customizes the figure's super-title. Passed to <code>fig.suptitle()</code>.</li>
+<li>Example: <code>suptitle_kwargs={'fontsize': 20, 'y': 0.98}</code></li>
+<li><code>xlabel_kwargs</code>: Customizes the x-axis label. Passed to <code>ax.set_xlabel()</code>.</li>
+<li>Example: <code>xlabel_kwargs={'fontsize': 12}</code></li>
+<li><code>ylabel_kwargs</code>: Customizes the y-axis label. Passed to <code>ax.set_ylabel()</code>.</li>
+<li>Example: <code>ylabel_kwargs={'fontsize': 12}</code></li>
+<li><code>ax_kwargs</code>: Customizes general axes properties. Passed to <code>ax.tick_params()</code>.</li>
+<li>Example: <code>ax_kwargs={'labelsize': 10}</code></li>
+<li><code>legend_kwargs</code>: Customizes the plot legend. Passed to <code>ax.legend()</code>.</li>
+<li>Example: <code>legend_kwargs={'loc': 'lower right', 'fontsize': 'small'}</code></li>
+<li><code>grid_kwargs</code>: Customizes the plot grid lines. Passed to <code>ax.grid()</code>.</li>
+<li>Example: <code>grid_kwargs={'linestyle': ':', 'alpha': 0.6}</code></li>
+</ul>
+<h4 id="metric-subplot-customization">Metric Subplot Customization</h4>
+<p>These <code>kwargs</code> are used when <code>plot_metric_progression=True</code> in the animation class constructor. They customize the appearance of the metric subplots and their corresponding lines.</p>
+<ul>
+<li><code>metric_title_kwargs</code>: Customizes the metric subplot title(s).</li>
+<li><code>metric_line_kwargs</code>: Customizes the metric progression line(s).</li>
+<li><code>metric_ax_kwargs</code>: Customizes the metric subplot axes.</li>
+<li><code>metric_xlabel_kwargs</code>: Customizes the metric subplot x-axis label(s).</li>
+<li><code>metric_ylabel_kwargs</code>: Customizes the metric subplot y-axis label(s).</li>
+<li><code>metric_annotation_kwargs</code>: Customizes the text annotation for the metric value.</li>
+</ul>
+<h3 id="class-specific-keyword-arguments">Class-Specific Keyword Arguments</h3>
+<p>The following <code>kwargs</code> are used with specific animation classes. They customize the appearance of the corresponding plot elements.</p>
+<h4 id="regressionanimation_1">RegressionAnimation</h4>
+<ul>
+<li><code>scatter_kwargs</code>: Customizes the scatter plot for training data points.</li>
+<li>Example: <code>scatter_kwargs={'color': 'green', 's': 50}</code></li>
+<li><code>scatter_kwargs_test</code>: Customizes the scatter plot for test data points.</li>
+<li>Example: <code>scatter_kwargs_test={'color': 'orange', 'marker': 's'}</code></li>
+<li><code>line_kwargs</code>: Customizes the fitted regression line.</li>
+<li>Example: <code>line_kwargs={'color': 'purple', 'linewidth': 3}</code></li>
+</ul>
+<h4 id="classificationanimation_1">ClassificationAnimation</h4>
+<ul>
+<li><code>scatter_kwargs</code>: Customizes the scatter plot for training data points.</li>
+<li>Example: <code>scatter_kwargs={'cmap': 'viridis', 's': 60}</code></li>
+<li><code>scatter_kwargs_test</code>: Customizes the scatter plot for test data points.</li>
+<li>Example: <code>scatter_kwargs_test={'marker': 'D', 's': 60}</code></li>
+<li><code>decision_boundary_kwargs</code>: Customizes the filled decision boundary regions. Passed to <code>ax.contourf()</code>.</li>
+<li>Example: <code>decision_boundary_kwargs={'alpha': 0.3, 'cmap': 'plasma'}</code></li>
+<li><code>decision_boundary_line_kwargs</code>: Customizes the decision boundary contour lines. Passed to <code>ax.contour()</code>.</li>
+<li>Example: <code>decision_boundary_line_kwargs={'linewidths': 2, 'colors': 'k'}</code></li>
+</ul>
+<h4 id="clusteringanimation_1">ClusteringAnimation</h4>
+<ul>
+<li><code>scatter_kwargs</code>: Customizes the scatter plot for clustered training data points.</li>
+<li><code>scatter_kwargs_test</code>: Customizes the scatter plot for clustered test data points.</li>
+<li><code>cluster_gray_train_kwargs</code>: Customizes the appearance of un-clustered training points.</li>
+<li><code>cluster_gray_test_kwargs</code>: Customizes the appearance of un-clustered test points.</li>
+<li><code>cluster_center_kwargs</code>: Customizes the cluster center markers.</li>
+<li>Example: <code>cluster_center_kwargs={'marker': 'X', 's': 400, 'c': 'red'}</code></li>
+<li><code>prev_center_kwargs</code>: Customizes the markers for previous cluster centers (if <code>keep_previous=True</code>).</li>
+<li><code>trace_line_kwargs</code>: Customizes the lines tracing cluster center movement (if <code>trace_centers=True</code>).</li>
+<li>Example: <code>trace_line_kwargs={'linestyle': '-', 'linewidth': 1.5}</code></li>
+</ul>
+<h4 id="forecastinganimation_1">ForecastingAnimation</h4>
+<ul>
+<li><code>train_line_kwargs</code>: Customizes the line plot for the training time series.</li>
+<li>Example: <code>train_line_kwargs={'color': 'gray', 'label': 'Historical Data'}</code></li>
+<li><code>vline_kwargs</code>: Customizes the vertical line indicating the start of the forecast.</li>
+<li>Example: <code>vline_kwargs={'color': 'red', 'linestyle': ':'}</code></li>
+<li><code>fitted_line_kwargs</code>: Customizes the line for the model's fitted values on the training data.</li>
+<li>Example: <code>fitted_line_kwargs={'color': 'orange', 'zorder': 4}</code></li>
+<li><code>forecast_line_kwargs</code>: Customizes the line for the forecasted values.</li>
+<li>Example: <code>forecast_line_kwargs={'color': 'purple', 'marker': 'o'}</code></li>
+</ul>
+<h4 id="transformationanimation_1">TransformationAnimation</h4>
+<ul>
+<li><code>scatter_kwargs</code>: Customizes the scatter plot for the original input data points.</li>
+<li>Example: <code>scatter_kwargs={'color': 'blue', 'alpha': 0.6}</code></li>
+<li><code>scatter_kwargs_test</code>: Customizes the scatter plot for the transformed data points.</li>
+<li>Example: <code>scatter_kwargs_test={'color': 'orange', 'alpha': 0.7, 'marker': 'x'}</code></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>
