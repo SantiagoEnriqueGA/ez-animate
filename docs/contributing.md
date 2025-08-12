@@ -112,6 +112,25 @@ uv run ruff check . --fix
 
 The CI/CD pipeline will fail if your code is not properly formatted, so it's best to run this before committing.
 
+### Type checking (mypy)
+
+We use mypy for static type checking with a strict-ish configuration defined in `pyproject.toml`.
+
+```bash
+# Install lint extras if not already installed
+uv pip install -e .[lint]
+
+# Run mypy for the repository (defaults to checking src/ez_animate)
+uv run mypy
+
+# Or explicitly target the package
+uv run mypy src/ez_animate
+```
+
+Notes:
+- The package is typed (includes `py.typed`).
+- The NumPy mypy plugin is enabled; `numpy` must be installed (it is in dependencies).
+
 ## Building the Documentation
 
 Our documentation is built with **MkDocs**. This allows you to preview your documentation changes locally before they are published.

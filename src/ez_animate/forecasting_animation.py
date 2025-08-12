@@ -4,6 +4,8 @@ from collections.abc import Callable
 from typing import Any
 
 import numpy as np
+import numpy.typing as npt
+from matplotlib.lines import Line2D
 
 from .animation_base import AnimationBase
 
@@ -14,8 +16,8 @@ class ForecastingAnimation(AnimationBase):
     def __init__(
         self,
         model: type[Any] | Callable[..., Any],
-        train_series: Any,
-        test_series: Any,
+        train_series: npt.NDArray[Any],
+        test_series: npt.NDArray[Any],
         forecast_steps: int,
         dynamic_parameter: str | None = None,
         static_parameters: dict[str, Any] | None = None,
@@ -57,9 +59,12 @@ class ForecastingAnimation(AnimationBase):
         )
         self._set_kwargs(**kwargs, subclass="ForecastingAnimation")
         self.forecast_steps = forecast_steps
+        self.fitted_line: Line2D | None = None
+        self.forecast_line: Line2D | None = None
         if self.keep_previous:
-            self.previous_forecast_lines = []  # List to store previous forecast lines
-            self.previous_fitted_lines = []  # List to store previous fitted lines
+            # Store previous Line2D artists
+            self.previous_forecast_lines: list[Line2D] = []
+            self.previous_fitted_lines: list[Line2D] = []
             self.max_previous = max_previous
 
         # Initialize plot elements
@@ -82,13 +87,18 @@ class ForecastingAnimation(AnimationBase):
         """Set up the plot for forecasting animation."""
         super().setup_plot(title, xlabel, ylabel, legend_loc, grid, figsize)
 
+        # mypy: ensure ax is initialized
+        assert self.ax is not None, "Axes not initialized. Did super().setup_plot run?"
+
         # Plot static elements using defaults
         self.ax.plot(self.train_indices, self.train_data, **self.train_line_kwargs)
         self.ax.axvline(x=len(self.train_data), **self.vline_kwargs)
 
         # Create placeholders for dynamic lines, with higher zorder and style
-        (self.fitted_line,) = self.ax.plot([], [], **self.fitted_line_kwargs)
-        (self.forecast_line,) = self.ax.plot([], [], **self.forecast_line_kwargs)
+        (fitted_line_obj,) = self.ax.plot([], [], **self.fitted_line_kwargs)
+        self.fitted_line = fitted_line_obj
+        (forecast_line_obj,) = self.ax.plot([], [], **self.forecast_line_kwargs)
+        self.forecast_line = forecast_line_obj
 
         # Auto-adjust y-limits based on the training data range
         min_y = min(self.train_data) - 0.5 * (
@@ -182,6 +192,15 @@ class ForecastingAnimation(AnimationBase):
         Args:
             frame: The current frame (e.g., parameter value).
         """
+        # mypy: ensure artists and axes exist
+        assert self.ax is not None, "Axes not initialized. Call setup_plot first."
+        assert self.fitted_line is not None, (
+            "fitted_line not initialized. Call setup_plot first."
+        )
+        assert self.forecast_line is not None, (
+            "forecast_line not initialized. Call setup_plot first."
+        )
+
         # --- Handle Previous Lines ---
         if self.keep_previous and self.forecast_line and self.fitted_line:
             # Limit the number of previous lines to avoid clutter
@@ -201,7 +220,9 @@ class ForecastingAnimation(AnimationBase):
                 line.set_alpha(0.1 + (0.4 / len(self.previous_fitted_lines)) * i)
                 line.set_color("lightgreen")
 
-            (self.fitted_line,) = self.ax.plot([], [], **self.fitted_line_kwargs)
+            # Recreate the current fitted line placeholder
+            (new_fitted_line,) = self.ax.plot([], [], **self.fitted_line_kwargs)
+            self.fitted_line = new_fitted_line
 
         # Update the dynamic lines with the latest fitted and forecasted values
         self.fitted_line.set_data(self.train_indices, self.fitted_values)

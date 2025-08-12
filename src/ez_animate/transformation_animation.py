@@ -3,6 +3,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
+import numpy.typing as npt
+from matplotlib.collections import PathCollection
+
 from .animation_base import AnimationBase
 
 
@@ -12,7 +15,7 @@ class TransformationAnimation(AnimationBase):
     def __init__(
         self,
         transformer: type[Any] | Callable[..., Any],
-        X: Any,
+        X: npt.NDArray[Any],
         dynamic_parameter: str | None = None,
         static_parameters: dict[str, Any] | None = None,
         keep_previous: bool = False,
@@ -62,9 +65,9 @@ class TransformationAnimation(AnimationBase):
         )
         self._set_kwargs(**kwargs, subclass="TransformationAnimation")
         self.X = X
-        self.transformed_X = None
-        if self.keep_previous:
-            self.previous_transforms = []
+        self.transformed_X: npt.NDArray[Any] | None = None
+        self.transformed_scatter: PathCollection | None = None
+        self.previous_transforms: list[npt.NDArray[Any]] = []
 
     def setup_plot(
         self,
@@ -86,6 +89,10 @@ class TransformationAnimation(AnimationBase):
             figsize: Size of the figure.
         """
         super().setup_plot(title, xlabel, ylabel, legend_loc, grid, figsize)
+        if self.ax is None:
+            raise RuntimeError(
+                "Axes not initialized. setup_plot must call super().setup_plot first."
+            )
         # Initial scatter plot of original data
         self.scatter = self.ax.scatter(
             self.X[:, 0], self.X[:, 1], label="Original Data", **self.scatter_kwargs
@@ -115,8 +122,17 @@ class TransformationAnimation(AnimationBase):
         Returns:
             tuple: Updated scatter plot artist(s).
         """
+        if self.ax is None:
+            raise RuntimeError(
+                "Axes not initialized. Call setup_plot before update_plot."
+            )
+        if self.transformed_X is None:
+            raise RuntimeError(
+                "Transformed data not available. Call update_model before update_plot."
+            )
+
         # Remove previous transformed scatter if exists
-        if hasattr(self, "transformed_scatter") and self.transformed_scatter:
+        if self.transformed_scatter is not None:
             self.transformed_scatter.remove()
         # Plot transformed data
         self.transformed_scatter = self.ax.scatter(

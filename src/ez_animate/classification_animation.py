@@ -3,8 +3,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
+import numpy.typing as npt
+from matplotlib.collections import PathCollection
+from matplotlib.contour import QuadContourSet
 
 from .animation_base import AnimationBase
 from .utils import PCA, train_test_split
@@ -16,8 +19,8 @@ class ClassificationAnimation(AnimationBase):
     def __init__(
         self,
         model: type[Any] | Callable[..., Any],
-        X: np.ndarray,
-        y: np.ndarray,
+        X: npt.NDArray[Any],
+        y: npt.NDArray[Any],
         test_size: float = 0.3,
         dynamic_parameter: str | None = None,
         static_parameters: dict[str, Any] | None = None,
@@ -122,14 +125,19 @@ class ClassificationAnimation(AnimationBase):
 
         # Store unique classes and assign colors
         self.unique_classes = np.unique(y)
-        cmap = plt.cm.coolwarm  # Default colormap
+        cmap = mpl.colormaps["coolwarm"]  # Default colormap
         self.colors = cmap(np.linspace(0, 1, len(self.unique_classes)))
 
-        self.scatter_train_dict = {}
-        self.scatter_test_dict = {}
+        self.scatter_train_dict: dict[Any, PathCollection] = {}
+        self.scatter_test_dict: dict[Any, PathCollection] = {}
 
         if self.keep_previous:
-            self.previous_decision_lines = []  # Store previous decision boundaries
+            # Store previous decision boundaries
+            self.previous_decision_lines: list[QuadContourSet] = []
+
+        # Current decision boundary artists (initialized later)
+        self.decision_boundary: QuadContourSet | None = None
+        self.decision_boundary_lines: QuadContourSet | None = None
 
     def setup_plot(
         self,
@@ -149,10 +157,14 @@ class ClassificationAnimation(AnimationBase):
             title, effective_xlabel, effective_ylabel, legend_loc, grid, figsize
         )
 
+        # mypy: self.ax is Optional in base; ensure it's initialized before use
+        assert self.ax is not None, "Axes not initialized; call setup_plot first."
+        ax = self.ax
+
         # Plot training data points, colored by class
         for i, class_value in enumerate(self.unique_classes):
             class_mask = self.y_train == class_value
-            scatter = self.ax.scatter(
+            scatter = ax.scatter(
                 self.X_train[class_mask, 0],
                 self.X_train[class_mask, 1],
                 color=self.colors[i],
@@ -164,7 +176,7 @@ class ClassificationAnimation(AnimationBase):
         # Plot test data points (optional)
         for i, class_value in enumerate(self.unique_classes):
             class_mask = self.y_test == class_value
-            scatter = self.ax.scatter(
+            scatter = ax.scatter(
                 self.X_test[class_mask, 0],
                 self.X_test[class_mask, 1],
                 color=self.colors[i],
@@ -174,11 +186,11 @@ class ClassificationAnimation(AnimationBase):
             self.scatter_test_dict[class_value] = scatter
 
         # Set plot limits based on meshgrid
-        self.ax.set_xlim(self.xx.min(), self.xx.max())
-        self.ax.set_ylim(self.yy.min(), self.yy.max())
+        ax.set_xlim(self.xx.min(), self.xx.max())
+        ax.set_ylim(self.yy.min(), self.yy.max())
 
         if self.add_legend:
-            self.ax.legend(loc=legend_loc)
+            ax.legend(loc=legend_loc)
 
     def update_model(self, frame: Any) -> None:
         """Update the classification model for the current frame.
@@ -244,8 +256,12 @@ class ClassificationAnimation(AnimationBase):
                 ) from None
         Z = Z.reshape(self.xx.shape)
 
+        # mypy: self.ax is Optional in base; ensure it's initialized before use
+        assert self.ax is not None, "Axes not initialized; call setup_plot first."
+        ax = self.ax
+
         # Plot the current decision boundary contourf (filled regions)
-        self.decision_boundary = self.ax.contourf(
+        self.decision_boundary = ax.contourf(
             self.xx,
             self.yy,
             Z,
@@ -255,7 +271,7 @@ class ClassificationAnimation(AnimationBase):
 
         # If only two classes, plot the decision boundary lines
         if len(np.unique(self.y_train)) == 2:
-            self.decision_boundary_lines = self.ax.contour(
+            self.decision_boundary_lines = ax.contour(
                 self.xx,
                 self.yy,
                 Z,
@@ -286,17 +302,17 @@ class ClassificationAnimation(AnimationBase):
                 self.plot_metric_progression
                 and getattr(self, "metric_lines", None) is not None
             ):
-                self.ax.set_title(
+                ax.set_title(
                     f"{self.dynamic_parameter}={frame_rounded}", **self.title_kwargs
                 )
             else:
-                self.ax.set_title(
+                ax.set_title(
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
                     **self.title_kwargs,
                 )
             print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
         else:
-            self.ax.set_title(
+            ax.set_title(
                 f"Classification ({self.dynamic_parameter}={frame})",
                 **self.title_kwargs,
             )

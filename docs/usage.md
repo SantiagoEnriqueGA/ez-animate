@@ -2,7 +2,7 @@
 
 `ez-animate` is compatible with both Scikit-learn and sega_learn models, making it a versatile tool for creating animations of machine learning model behavior. See below for examples of how to use `ez-animate` with different types of models. Or see [API Reference](api.md) for more details on available methods and customization options.
 
-More advanced usage examples can be found in the on [GitHub](https://github.com/SantiagoEnriqueGA/ez-animate/tree/master/examples).
+More advanced usage examples can be found on [GitHub](https://github.com/SantiagoEnriqueGA/ez-animate/tree/master/examples).
 
 
 ## Complete Scikit-learn Example

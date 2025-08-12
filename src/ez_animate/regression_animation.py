@@ -4,6 +4,9 @@ from collections.abc import Callable
 from typing import Any
 
 import numpy as np
+import numpy.typing as npt
+from matplotlib.collections import PathCollection
+from matplotlib.lines import Line2D
 
 from .animation_base import AnimationBase
 from .utils import PCA, train_test_split
@@ -15,8 +18,8 @@ class RegressionAnimation(AnimationBase):
     def __init__(
         self,
         model: type[Any] | Callable[..., Any],
-        X: np.ndarray,
-        y: np.ndarray,
+        X: npt.NDArray[Any],
+        y: npt.NDArray[Any],
         test_size: float = 0.3,
         dynamic_parameter: str | None = None,
         static_parameters: dict[str, Any] | None = None,
@@ -113,12 +116,16 @@ class RegressionAnimation(AnimationBase):
         self.X_test, self.y_test = X_test, y_test
 
         # Initialize plot elements
-        self.scatter_points = None
-        self.scatter_points_test = None
-        self.predicted_line = None
+        self.scatter_points: PathCollection | None = None
+        self.scatter_points_test: PathCollection | None = None
+        self.predicted_line: Line2D | None = None
 
+        # Track previous regression lines
+        self.previous_predicted_lines: list[
+            Line2D
+        ] = []  # List to store previous predicted lines
         if self.keep_previous:
-            self.previous_predicted_lines = []  # List to store previous predicted lines
+            self.previous_predicted_lines = []
 
     def setup_plot(
         self,
@@ -131,7 +138,11 @@ class RegressionAnimation(AnimationBase):
     ) -> None:
         """Set up the plot for regression animation."""
         # Use generic "Feature" label if PCA was applied
-        if self.needs_pca and self.pca_instance.n_components == 1:
+        if (
+            self.needs_pca
+            and self.pca_instance is not None
+            and self.pca_instance.n_components == 1
+        ):
             effective_xlabel = f"{xlabel} (PCA Component 1)"
         elif self.X_train.shape[1] == 1:
             effective_xlabel = xlabel  # Use original if only 1 feature initially
@@ -140,6 +151,9 @@ class RegressionAnimation(AnimationBase):
             print("Warning: Plotting only the first feature for regression line.")
 
         super().setup_plot(title, effective_xlabel, ylabel, legend_loc, grid, figsize)
+
+        # mypy: self.ax is set by super().setup_plot
+        assert self.ax is not None, "Axes not initialized. Call setup_plot first."
 
         # Plot static elements (scatter points for training data)
         self.scatter_points = self.ax.scatter(
@@ -188,7 +202,7 @@ class RegressionAnimation(AnimationBase):
             frame: The current frame (e.g., parameter value).
         """
         # --- Handle Previous Lines ---
-        if self.keep_previous and self.predicted_line:
+        if self.keep_previous and self.predicted_line is not None:
             # Limit the number of previous lines to avoid clutter (optional)
             if self.max_previous:
                 while len(self.previous_predicted_lines) > self.max_previous:
@@ -207,6 +221,7 @@ class RegressionAnimation(AnimationBase):
                 **self.line_kwargs,
                 "zorder": len(self.previous_predicted_lines) + 1,
             }
+            assert self.ax is not None, "Axes not initialized. Call setup_plot first."
             (self.predicted_line,) = self.ax.plot(
                 [],
                 [],
@@ -215,7 +230,13 @@ class RegressionAnimation(AnimationBase):
             )
 
         # Update the regression line with the predicted values
+        assert self.predicted_line is not None, (
+            "Predicted line not initialized. Call setup_plot first."
+        )
         self.predicted_line.set_data(self.X_test_sorted[:, 0], self.predicted_values)
+
+        # Ensure axes exist before setting title (for mypy)
+        assert self.ax is not None, "Axes not initialized. Call setup_plot first."
 
         # Update the title with the current frame and optional metrics
         if self.metric_fn:

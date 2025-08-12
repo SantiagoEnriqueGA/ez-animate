@@ -24,3 +24,15 @@ repos:
       - id: ruff-format
         name: Run Ruff Formatter
         args: [--config=pyproject.toml] # Explicitly specify config file (optional)
+
+  # Optional: mypy type checking pre-commit hook (uses pyproject.toml config)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.1
+    hooks:
+      - id: mypy
+        name: Run mypy (type checks)
+        additional_dependencies:
+          - numpy
+        args:
+          - --config-file=pyproject.toml
+        files: ^src/ez_animate/.*\.py$

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import contextlib
 import sys
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable, Sequence
-from typing import Any
+from typing import Any, cast
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 # Animation Class
 # The goal is to create a reusable and modular animation class that can handle animations for any model and dataset.
@@ -35,6 +38,16 @@ import numpy as np
 
 class AnimationBase(ABC):
     """Base class for creating animations of machine learning models."""
+
+    # Class-level attribute type annotations for mypy
+    fig: Figure | None
+    ax: Axes | None
+    lines: dict[str, Any]
+    title: Any
+    metric_axes: list[Axes] | None
+    metric_lines: list[Any] | None
+    ani: animation.FuncAnimation | None
+    _metric_annotations: list[Any] | None
 
     def __init__(
         self,
@@ -81,10 +94,10 @@ class AnimationBase(ABC):
         self.static_parameters = (
             static_parameters if static_parameters is not None else {}
         )
-        self.keep_previous = bool(keep_previous)  # type: bool
+        self.keep_previous: bool = bool(keep_previous)
 
         # Store additional keyword arguments
-        self.kwargs = kwargs  # type: dict[str, Any]
+        self.kwargs: dict[str, Any] = kwargs
 
         # Optional metric function (e.g., MSE)
         if metric_fn is None:
@@ -94,15 +107,16 @@ class AnimationBase(ABC):
         else:
             self.metric_fn = [metric_fn]
         self.plot_metric_progression = bool(plot_metric_progression)
-        self.max_metric_subplots = max_metric_subplots if max_metric_subplots else 1  # type: int
+        self.max_metric_subplots: int = (
+            max_metric_subplots if max_metric_subplots else 1
+        )
 
         # For each metric, keep a progression list (up to max_metric_subplots)
+        self.metric_progression: list[list[float]] | None = None
         if self.metric_fn and self.plot_metric_progression:
-            self.metric_progression = [  # type: list[list[float]]
+            self.metric_progression = [
                 [] for _ in range(min(len(self.metric_fn), self.max_metric_subplots))
             ]
-        else:
-            self.metric_progression = None
 
         # Plot elements
         self.fig = None
@@ -111,6 +125,8 @@ class AnimationBase(ABC):
         self.title = None
         self.metric_axes = None
         self.metric_lines = None
+        self._metric_annotations = None
+        self.ani = None
 
     def _set_kwargs(self, subclass: str | None = None, **kwargs: Any) -> None:
         """Set the keyword arguments for plot customization, with defaults for all animation types."""
@@ -268,6 +284,7 @@ class AnimationBase(ABC):
             )
             self.metric_axes = []
             self.metric_lines = []
+            self._metric_annotations = []
             for i in range(n_metrics):
                 metric_ax = self.fig.add_subplot(metric_gs[i, 0])
                 (metric_line,) = metric_ax.plot(
@@ -287,6 +304,7 @@ class AnimationBase(ABC):
                 metric_ax.tick_params(axis="both", which="major", labelsize=8)
                 self.metric_axes.append(metric_ax)
                 self.metric_lines.append(metric_line)
+                self._metric_annotations.append(None)
                 self.ax.set_title(f"{self.dynamic_parameter}=", **self.title_kwargs)
             self.fig.suptitle(title, **self.suptitle_kwargs)
         if legend_loc is not None:
@@ -307,7 +325,7 @@ class AnimationBase(ABC):
             and self.metric_lines is not None
             and self.metric_axes is not None
         ):
-            for _, (progression, metric_line, metric_ax) in enumerate(
+            for idx, (progression, metric_line, metric_ax) in enumerate(
                 zip(self.metric_progression, self.metric_lines, self.metric_axes)
             ):
                 x_data = np.arange(len(progression))
@@ -316,12 +334,18 @@ class AnimationBase(ABC):
                 metric_ax.relim()
                 metric_ax.autoscale_view()
                 # Remove previous annotation if it exists
-                if (
-                    hasattr(metric_ax, "_current_metric_annotation")
-                    and metric_ax._current_metric_annotation is not None
+                prev_annotation = None
+                if self._metric_annotations is not None and idx < len(
+                    self._metric_annotations
                 ):
-                    metric_ax._current_metric_annotation.remove()
-                    metric_ax._current_metric_annotation = None
+                    prev_annotation = self._metric_annotations[idx]
+                if prev_annotation is not None:
+                    with contextlib.suppress(Exception):
+                        prev_annotation.remove()
+                    if self._metric_annotations is not None:
+                        self._metric_annotations[idx] = None
+                    # also clear attribute on Axes for tests
+                    cast(Any, metric_ax)._current_metric_annotation = None
                 # Add annotation for the current value (last value in progression) at the top left corner
                 if len(x_data) > 0 and len(y_data) > 0:
                     annotation = metric_ax.annotate(
@@ -345,9 +369,14 @@ class AnimationBase(ABC):
                         },
                         **self.metric_annotation_kwargs,
                     )
-                    metric_ax._current_metric_annotation = annotation
+                    if self._metric_annotations is not None:
+                        self._metric_annotations[idx] = annotation
+                    # also set attribute on Axes for tests
+                    cast(Any, metric_ax)._current_metric_annotation = annotation
                 else:
-                    metric_ax._current_metric_annotation = None
+                    if self._metric_annotations is not None:
+                        self._metric_annotations[idx] = None
+                    cast(Any, metric_ax)._current_metric_annotation = None
 
     @abstractmethod
     def update_model(self, frame: Any) -> None:
@@ -374,13 +403,17 @@ class AnimationBase(ABC):
             blit: Whether to use blitting for faster rendering.
             repeat: Whether to repeat the animation.
         """
+        # Ensure the plot has been set up
+        if self.fig is None:
+            raise RuntimeError("Plot has not been set up. Call `setup_plot` first.")
+        fig: Figure = self.fig
 
-        def _update(frame):
+        def _update(frame: Any) -> tuple[Any, ...] | list[Any]:
             self.update_model(frame)
             return self.update_plot(frame)
 
         self.ani = animation.FuncAnimation(
-            self.fig,
+            fig,
             _update,
             frames=frames,
             interval=interval,
@@ -405,13 +438,15 @@ class AnimationBase(ABC):
             fps: Frames per second.
             dpi: Dots per inch for the saved figure.
         """
-        if not hasattr(self, "ani"):
+        # Ensure an animation object exists
+        ani = self.ani
+        if ani is None:
             raise RuntimeError("Animation has not been created. Call `animate` first.")
         # print(f"Saving animation to {filename} (this may take a while)...")
         # progress_callback = lambda i, n: print(f"Saving frame {i+1}/{n}", end='\r')
 
         try:
-            self.ani.save(filename, writer=writer, fps=fps, dpi=dpi)
+            ani.save(filename, writer=writer, fps=fps, dpi=dpi)
             sys.stdout.write("\033[K")  # Clear the line
             print(f"Animation saved successfully to {filename}.")
         except Exception as e:
