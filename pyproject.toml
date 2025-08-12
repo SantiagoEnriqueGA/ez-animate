@@ -47,6 +47,7 @@ docs = [
 ]
 lint = [
     "ruff",
+    "mypy>=1.10",
 ]
 
 # Combined 'dev' group for convenience
@@ -148,6 +149,9 @@ convention = "google" # <- Using Google style guide for docstrings (not "numpy" 
 [tool.hatch.build.targets.wheel]
 # Ensure only the package under src is included in the wheel
 packages = ["src/ez_animate"]
+include = [
+    "src/ez_animate/py.typed",
+]
 exclude = [
     "**/__pycache__/**",
     "**/*.py[cod]",
@@ -169,4 +173,36 @@ exclude = [
     "**/*.png",
     "**/*.jpg",
     "**/*.svg",
+]
+
+[tool.mypy]
+# Scope
+files = ["src/ez_animate"]
+mypy_path = ["src"]
+python_version = "3.12"
+
+# Strict-ish defaults aimed at keeping the public surface fully typed
+disallow_untyped_defs = true    # untyped function definitions
+disallow_incomplete_defs = true # incomplete function definitions
+disallow_untyped_calls = true   # untyped function calls
+no_implicit_optional = true     # implicit optionality
+disallow_any_generics = true    # usage of 'Any' in generics
+disallow_subclassing_any = true # subclassing of 'Any'
+check_untyped_defs = true       # untyped function definitions
+implicit_reexport = false       # implicit reexporting of types
+strict_equality = true          # implicit equality checks
+
+# Warnings and ergonomics
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+show_error_codes = true
+pretty = true
+color_output = true
+warn_unused_configs = true
+
+# Plugins
+plugins = [
+    "numpy.typing.mypy_plugin",
 ]
