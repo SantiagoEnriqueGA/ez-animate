@@ -269,15 +269,16 @@ class RegressionAnimation(AnimationBase):
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
                     **self.title_kwargs,
                 )
-            print(
-                f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}",
-                end="\r",
-            )
+            if not self.tqdm_available:
+                print(
+                    f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r"
+                )
         else:
             self.ax.set_title(
                 f"Regression ({self.dynamic_parameter}={frame})", **self.title_kwargs
             )
-            print(f"{self.dynamic_parameter}: {frame}", end="\r")
+            if not self.tqdm_available:
+                print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting
         if self.plot_metric_progression and self.metric_lines is not None:

@@ -259,14 +259,18 @@ class ForecastingAnimation(AnimationBase):
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
                     **self.title_kwargs,
                 )
-            print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
+            if not self.tqdm_available:
+                print(
+                    f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r"
+                )
         else:
             frame_rounded = round(frame, 2) if isinstance(frame, float) else frame
             self.ax.set_title(
                 f"Forecast ({self.dynamic_parameter}={frame_rounded})",
                 **self.title_kwargs,
             )
-            print(f"{self.dynamic_parameter}: {frame}", end="\r")
+            if not self.tqdm_available:
+                print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting
         if (

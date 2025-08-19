@@ -430,10 +430,14 @@ class ClusteringAnimation(AnimationBase):
                     f"{self.dynamic_parameter}={frame_rounded} - {metric_str}",
                     fontsize=10,
                 )
-            print(f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r")
+            if not self.tqdm_available:
+                print(
+                    f"{self.dynamic_parameter}: {frame_rounded}, {metric_str}", end="\r"
+                )
         else:
             ax.set_title(f"Clustering ({self.dynamic_parameter}={frame})")
-            print(f"{self.dynamic_parameter}: {frame}", end="\r")
+            if not self.tqdm_available:
+                print(f"{self.dynamic_parameter}: {frame}", end="\r")
 
         # Return all artists that are updated for blitting
         if (
