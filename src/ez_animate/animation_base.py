@@ -36,6 +36,14 @@ from matplotlib.figure import Figure
 #     - Each subclass can have its own attributes and methods specific to the model type.
 
 
+try:
+    from tqdm import tqdm
+
+    tqdm_available = True
+except ImportError:
+    tqdm_available = False
+
+
 class AnimationBase(ABC):
     """Base class for creating animations of machine learning models."""
 
@@ -48,6 +56,7 @@ class AnimationBase(ABC):
     metric_lines: list[Any] | None
     ani: animation.FuncAnimation | None
     _metric_annotations: list[Any] | None
+    tqdm_available: bool = tqdm_available
 
     def __init__(
         self,
@@ -412,6 +421,17 @@ class AnimationBase(ABC):
             self.update_model(frame)
             return self.update_plot(frame)
 
+        # Ensure frames is Sized
+        if isinstance(frames, int):
+            self.frame_len = frames - 1
+        elif isinstance(frames, Sequence):
+            self.frame_len = len(frames) - 1
+        elif isinstance(frames, Iterable):
+            frames = list(frames)
+            self.frame_len = len(frames) - 1
+        else:
+            raise TypeError("frames must be an int, Sequence, or Iterable")
+
         self.ani = animation.FuncAnimation(
             fig,
             _update,
@@ -446,8 +466,30 @@ class AnimationBase(ABC):
         # progress_callback = lambda i, n: print(f"Saving frame {i+1}/{n}", end='\r')
 
         try:
-            ani.save(filename, writer=writer, fps=fps, dpi=dpi)
-            sys.stdout.write("\033[K")  # Clear the line
+            if self.tqdm_available:
+                last = [0]
+
+                def progress_callback(i: int, n: int) -> None:
+                    increment = i - last[0]
+                    if increment > 0:
+                        pbar.update(increment)
+                        last[0] = i
+
+                    if i == n - 1:
+                        # set description
+                        pbar.set_description("Creation complete, saving...")
+
+                with tqdm(total=self.frame_len, desc="Creating animation") as pbar:
+                    ani.save(
+                        filename,
+                        writer=writer,
+                        fps=fps,
+                        dpi=dpi,
+                        progress_callback=progress_callback,
+                    )
+            else:
+                ani.save(filename, writer=writer, fps=fps, dpi=dpi)
+                sys.stdout.write("\033[K")  # Clear the line
             print(f"Animation saved successfully to {filename}.")
         except Exception as e:
             sys.stdout.write("\033[K")  # Clear the line on error too
