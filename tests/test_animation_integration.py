@@ -176,6 +176,32 @@ class TestAnimationBase(BaseTest):
         with self.assertRaises(RuntimeError):
             animator.animate(frames=[0], interval=150, blit=True, repeat=False)
 
+    def test_save_no_tqdm(self):
+        """Test that save() works when tqdm is not available (tqdm_available = False)."""
+        animator = ForecastingAnimation(
+            model=ExponentialMovingAverage,
+            train_series=np.array([1, 2, 3]),
+            test_series=np.array([4, 5, 6]),
+            forecast_steps=3,
+            dynamic_parameter="alpha",
+        )
+        animator.setup_plot("Test", "X", "Y")
+        # Patch tqdm_available to False and patch the save method
+        animator.tqdm_available = False
+        with patch("matplotlib.animation.FuncAnimation") as mock_animation:
+            mock_instance = mock_animation.return_value
+            animator.ani = mock_instance
+            with patch("builtins.print") as mock_print:
+                animator.save("test_no_tqdm.gif", writer="pillow", fps=5, dpi=100)
+                mock_instance.save.assert_called_once_with(
+                    "test_no_tqdm.gif", writer="pillow", fps=5, dpi=100
+                )
+                mock_print.assert_called_with(
+                    "Animation saved successfully to test_no_tqdm.gif."
+                )
+        plt.close(animator.fig)
+
+
 class TestAnimationIntegration(BaseTest):
     """Integration tests for animation classes."""
 
@@ -344,6 +370,7 @@ class TestAnimationIntegration(BaseTest):
             animator.ani = mock_instance  # Set the animation attribute
 
             # Test saving
+            animator.tqdm_available = False  # Disable tqdm for testing
             animator.save("test.gif", writer="pillow", fps=5, dpi=100)
             mock_instance.save.assert_called_once_with(
                 "test.gif", writer="pillow", fps=5, dpi=100
